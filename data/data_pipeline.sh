@@ -9,6 +9,7 @@ RAW_DIR="data/raw"
 UNIFIED_DIR="data/unified"
 DATASET_ID="${DATASET_ID:-}"
 SKIP_DOWNLOAD="${SKIP_DOWNLOAD:-0}"
+SKIP_QUALITY="${SKIP_QUALITY:-0}"
 
 echo "=== AnemiaScan Data Pipeline ==="
 echo "Raw dir:     $RAW_DIR"
@@ -32,9 +33,10 @@ fi
 echo "--- Step 2: Unifying datasets ---"
 python data/scripts/unify_datasets.py --raw-dir "$RAW_DIR" --output-dir "$UNIFIED_DIR"
 
-# Step 3: Quality filter
-echo "--- Step 3: Quality filtering ---"
-python -c "
+# Step 3: Quality filter (skip for small/test datasets with SKIP_QUALITY=1)
+if [ "$SKIP_QUALITY" = "0" ]; then
+    echo "--- Step 3: Quality filtering ---"
+    python -c "
 from data.scripts.quality_filter import filter_metadata
 import pathlib
 filter_metadata(
@@ -42,6 +44,9 @@ filter_metadata(
     pathlib.Path('$UNIFIED_DIR/metadata.csv')
 )
 "
+else
+    echo "--- Step 3: Skipping quality filter (SKIP_QUALITY=1) ---"
+fi
 
 # Step 4: Push to HF
 echo "--- Step 4: Pushing to HuggingFace Hub ---"

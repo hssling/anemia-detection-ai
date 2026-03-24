@@ -55,6 +55,12 @@ def push_to_hub(
         splits[split_name] = hf_dataset
         log.info(f"  {split_name}: {len(split_df)} samples")
 
+    if not splits:
+        raise ValueError(
+            "No data rows remain after quality filtering. "
+            "All images were rejected — check MIN_SHORT_EDGE threshold vs dataset resolution."
+        )
+
     dataset_dict = DatasetDict(splits)
 
     log.info(f"Pushing to {repo_id} ...")
