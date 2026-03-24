@@ -40,13 +40,14 @@ def mc_dropout_predict(
     hb_samples = []
     cls_samples = []
 
-    with torch.no_grad():
-        for _ in range(n_samples):
-            hb_pred, cls_logits = model(image_tensor)
-            hb_samples.append(hb_pred.item())
-            cls_samples.append(torch.softmax(cls_logits, dim=1).squeeze().numpy())
-
-    model.eval()
+    try:
+        with torch.no_grad():
+            for _ in range(n_samples):
+                hb_pred, cls_logits = model(image_tensor)
+                hb_samples.append(hb_pred.item())
+                cls_samples.append(torch.softmax(cls_logits, dim=1).squeeze().numpy())
+    finally:
+        model.eval()  # always restore eval mode, even on exception
 
     hb_arr = np.array(hb_samples)
     cls_arr = np.array(cls_samples).mean(axis=0)  # (4,)
@@ -63,6 +64,7 @@ def mc_dropout_predict(
         "class_probabilities": {
             name: round(float(cls_arr[i]), 4) for i, name in enumerate(CLASS_NAMES)
         },
+        "_hb_samples": hb_arr.tolist(),  # kept for ensemble CI computation; stripped before API response
     }
 
 
@@ -95,26 +97,21 @@ def run_full_prediction(
 
     # Ensemble
     if "conjunctiva" in results and "nailbed" in results:
-        hb = (
-            w_conj * results["conjunctiva"]["hb_estimate"]
-            + w_nail * results["nailbed"]["hb_estimate"]
-        )
         cls_probs = {
             k: w_conj * results["conjunctiva"]["class_probabilities"][k]
             + w_nail * results["nailbed"]["class_probabilities"][k]
             for k in CLASS_NAMES
         }
         best_cls = max(cls_probs, key=cls_probs.get)
-        ci_lo = (
-            w_conj * results["conjunctiva"]["hb_ci_95"][0]
-            + w_nail * results["nailbed"]["hb_ci_95"][0]
-        )
-        ci_hi = (
-            w_conj * results["conjunctiva"]["hb_ci_95"][1]
-            + w_nail * results["nailbed"]["hb_ci_95"][1]
-        )
+        # Compute CI from combined weighted MC samples (statistically valid)
+        samples_c = np.array(results["conjunctiva"]["_hb_samples"])
+        samples_n = np.array(results["nailbed"]["_hb_samples"])
+        ensemble_samples = w_conj * samples_c + w_nail * samples_n
+        hb_mean = float(np.mean(ensemble_samples))
+        ci_lo = float(np.percentile(ensemble_samples, 2.5))
+        ci_hi = float(np.percentile(ensemble_samples, 97.5))
         ensemble = {
-            "hb_estimate": round(hb, 2),
+            "hb_estimate": round(hb_mean, 2),
             "hb_ci_95": [round(ci_lo, 2), round(ci_hi, 2)],
             "classification": best_cls,
             "class_probabilities": {k: round(v, 4) for k, v in cls_probs.items()},
@@ -123,6 +120,10 @@ def run_full_prediction(
         ensemble = results["conjunctiva"]
     else:
         ensemble = results["nailbed"]
+
+    # Strip internal MC samples before returning — not part of the public API contract
+    for r in results.values():
+        r.pop("_hb_samples", None)
 
     return {
         **ensemble,

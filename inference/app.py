@@ -41,6 +41,19 @@ app.add_middleware(
 W_CONJ = float(os.getenv("ENSEMBLE_W_CONJ", "0.5"))
 W_NAIL = float(os.getenv("ENSEMBLE_W_NAIL", "0.5"))
 
+_MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
+_MAX_IMAGE_PIXELS = 4096 * 4096  # ~16 MP
+
+
+def _open_image(raw: bytes) -> Image.Image:
+    """Open image bytes with size guards to prevent OOM from malicious uploads."""
+    if len(raw) > _MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="Image file too large (max 10 MB).")
+    img = Image.open(io.BytesIO(raw))
+    if img.width * img.height > _MAX_IMAGE_PIXELS:
+        raise HTTPException(status_code=400, detail="Image dimensions too large (max 4096x4096).")
+    return img.convert("RGB")
+
 
 @app.on_event("startup")
 async def startup():
@@ -60,7 +73,7 @@ def health():
 async def predict(
     conjunctiva_image: UploadFile | None = File(default=None),
     nailbed_image: UploadFile | None = File(default=None),
-    model: str = Form(default="ensemble"),
+    _model: str = Form(default="ensemble"),
     include_gradcam: str = Form(default="false"),
 ):
     if conjunctiva_image is None and nailbed_image is None:
@@ -71,11 +84,11 @@ async def predict(
 
     if conjunctiva_image is not None:
         raw = await conjunctiva_image.read()
-        conj_pil = Image.open(io.BytesIO(raw)).convert("RGB")
+        conj_pil = _open_image(raw)
 
     if nailbed_image is not None:
         raw = await nailbed_image.read()
-        nail_pil = Image.open(io.BytesIO(raw)).convert("RGB")
+        nail_pil = _open_image(raw)
 
     try:
         conj_model = load_model("conjunctiva") if conj_pil else None
@@ -83,14 +96,20 @@ async def predict(
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Model loading failed: {e}")
 
-    result = run_full_prediction(
-        conj_img=conj_pil,
-        nail_img=nail_pil,
-        conj_model=conj_model,
-        nail_model=nail_model,
-        w_conj=W_CONJ,
-        w_nail=W_NAIL,
-    )
+    try:
+        result = run_full_prediction(
+            conj_img=conj_pil,
+            nail_img=nail_pil,
+            conj_model=conj_model,
+            nail_model=nail_model,
+            w_conj=W_CONJ,
+            w_nail=W_NAIL,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        log.exception("Prediction failed")
+        raise HTTPException(status_code=500, detail="Internal prediction error.")
 
     if include_gradcam.lower() == "true":
         try:
