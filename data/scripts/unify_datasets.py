@@ -50,6 +50,58 @@ def assign_anemia_class(hb: float, age_group: str) -> str:
         return "severe"
 
 
+# Folder name patterns that indicate anemia-positive class
+_ANEMIA_FOLDER_KEYWORDS = {"anemia", "anaemia", "positive", "pos"}
+
+
+def _is_anemia_folder(folder_name: str) -> bool:
+    """Return True if the folder name indicates anemia-positive class."""
+    name_lower = folder_name.lower()
+    return any(kw in name_lower for kw in _ANEMIA_FOLDER_KEYWORDS)
+
+
+def _unify_from_folders(
+    dataset_id: str,
+    source_dir: pathlib.Path,
+    output_dir: pathlib.Path,
+    site: str,
+    age_group: str,
+) -> list[dict]:
+    """
+    Build rows from a folder-based dataset (no CSV labels file).
+    Expects subdirectories named so that anemia-positive folders contain one of
+    _ANEMIA_FOLDER_KEYWORDS (case-insensitive). All other subdirs are treated as normal.
+    """
+    img_extensions = {".jpg", ".jpeg", ".png", ".bmp"}
+    rows = []
+    idx = 0
+    for folder in sorted(source_dir.rglob("*")):
+        if not folder.is_dir():
+            continue
+        anemia_cls = "anemia" if _is_anemia_folder(folder.name) else "normal"
+        for src_img in sorted(folder.iterdir()):
+            if src_img.suffix.lower() not in img_extensions:
+                continue
+            new_name = f"{dataset_id}_{site}_{idx:05d}.jpg"
+            dest_img = output_dir / new_name
+            shutil.copy2(src_img, dest_img)
+            rows.append(
+                {
+                    "image_id": new_name.replace(".jpg", ""),
+                    "image_path": str(dest_img),
+                    "site": site,
+                    "hb_value": None,  # binary dataset — no continuous Hb
+                    "anemia_class": anemia_cls,
+                    "age_group": age_group,
+                    "source_dataset": dataset_id,
+                    "image_quality_score": None,
+                    "split": None,
+                }
+            )
+            idx += 1
+    return rows
+
+
 def unify_dataset(
     dataset_id: str,
     source_dir: pathlib.Path,
@@ -64,50 +116,58 @@ def unify_dataset(
     """
     Unify a single downloaded dataset into standard format.
     Returns path to the produced metadata CSV.
+    Supports CSV-based and folder-based label formats.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     labels_path = source_dir / labels_csv
 
-    if not labels_path.exists():
-        candidates = list(source_dir.rglob("*.csv"))
-        if not candidates:
-            raise FileNotFoundError(f"No CSV found under {source_dir}")
-        labels_path = candidates[0]
+    # Detect label format: try CSV first, fall back to folder-based
+    csv_candidates = list(source_dir.rglob("*.csv"))
+    if not labels_path.exists() and csv_candidates:
+        labels_path = csv_candidates[0]
         log.warning(f"  Using {labels_path} as labels CSV")
 
-    df = pd.read_csv(labels_path)
+    if labels_path.exists():
+        # --- CSV-based labels ---
+        df = pd.read_csv(labels_path)
+        rows = []
+        for idx, row in df.iterrows():
+            orig_filename = row[filename_column]
+            src_img = None
+            for candidate in source_dir.rglob(orig_filename):
+                src_img = candidate
+                break
+            if src_img is None or not src_img.exists():
+                log.warning(f"  Image not found: {orig_filename} -- skipping")
+                continue
 
-    rows = []
-    for idx, row in df.iterrows():
-        orig_filename = row[filename_column]
-        src_img = None
-        for candidate in source_dir.rglob(orig_filename):
-            src_img = candidate
-            break
-        if src_img is None or not src_img.exists():
-            log.warning(f"  Image not found: {orig_filename} -- skipping")
-            continue
+            new_name = f"{dataset_id}_{site}_{idx:05d}.jpg"
+            dest_img = output_dir / new_name
+            shutil.copy2(src_img, dest_img)
 
-        new_name = f"{dataset_id}_{site}_{idx:05d}.jpg"
-        dest_img = output_dir / new_name
-        shutil.copy2(src_img, dest_img)
+            hb_val = (
+                float(row[hb_column]) if hb_column in row and pd.notna(row[hb_column]) else None
+            )
+            anemia_cls = assign_anemia_class(hb_val, age_group) if hb_val is not None else "unknown"
 
-        hb_val = float(row[hb_column]) if hb_column in row and pd.notna(row[hb_column]) else None
-        anemia_cls = assign_anemia_class(hb_val, age_group) if hb_val is not None else "unknown"
+            rows.append(
+                {
+                    "image_id": new_name.replace(".jpg", ""),
+                    "image_path": str(dest_img),
+                    "site": site,
+                    "hb_value": hb_val,
+                    "anemia_class": anemia_cls,
+                    "age_group": age_group,
+                    "source_dataset": dataset_id,
+                    "image_quality_score": None,
+                    "split": None,
+                }
+            )
 
-        rows.append(
-            {
-                "image_id": new_name.replace(".jpg", ""),
-                "image_path": str(dest_img),
-                "site": site,
-                "hb_value": hb_val,
-                "anemia_class": anemia_cls,
-                "age_group": age_group,
-                "source_dataset": dataset_id,
-                "image_quality_score": None,
-                "split": None,
-            }
-        )
+    else:
+        # --- Folder-based labels (no CSV found) ---
+        log.info(f"  {dataset_id}: no CSV found, using folder-based labels")
+        rows = _unify_from_folders(dataset_id, source_dir, output_dir, site, age_group)
 
     meta_df = pd.DataFrame(rows, columns=REQUIRED_COLUMNS)
     meta_path = output_dir / f"{dataset_id}_metadata.csv"
