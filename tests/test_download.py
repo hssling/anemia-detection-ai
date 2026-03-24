@@ -37,6 +37,27 @@ def test_kaggle_entries_have_kaggle_id():
             assert "kaggle_id" in entry, f"Kaggle entry {entry['id']} missing kaggle_id"
 
 
+def test_mendeley_entries_have_required_fields():
+    """Mendeley source entries must declare dataset id and version."""
+    registry_path = pathlib.Path("data/dataset_registry.yaml")
+    with open(registry_path) as f:
+        registry = yaml.safe_load(f)
+    for entry in registry["datasets"]:
+        if entry["source"] == "mendeley":
+            assert "mendeley_id" in entry, f"Mendeley entry {entry['id']} missing mendeley_id"
+            assert "version" in entry, f"Mendeley entry {entry['id']} missing version"
+
+
+def test_manual_entries_have_manual_url():
+    """Manual source entries must point to the request/download page."""
+    registry_path = pathlib.Path("data/dataset_registry.yaml")
+    with open(registry_path) as f:
+        registry = yaml.safe_load(f)
+    for entry in registry["datasets"]:
+        if entry["source"] == "manual":
+            assert "manual_url" in entry, f"Manual entry {entry['id']} missing manual_url"
+
+
 def test_site_values_valid():
     """site field must be 'conjunctiva' or 'nailbed'."""
     registry_path = pathlib.Path("data/dataset_registry.yaml")

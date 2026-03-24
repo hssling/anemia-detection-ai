@@ -7,13 +7,17 @@ set -euo pipefail
 
 RAW_DIR="data/raw"
 UNIFIED_DIR="data/unified"
-DATASET_ID="${DATASET_ID:-}"
+DATASET_ID="${DATASET_ID:-cp_anemic_ghana}"
 SKIP_DOWNLOAD="${SKIP_DOWNLOAD:-0}"
-SKIP_QUALITY="${SKIP_QUALITY:-0}"
+SKIP_QUALITY="${SKIP_QUALITY:-1}"
+HF_DATASET_REPO="${HF_DATASET_REPO:-hssling/anemia-conjunctiva-nailbed}"
 
 echo "=== AnemiaScan Data Pipeline ==="
 echo "Raw dir:     $RAW_DIR"
 echo "Unified dir: $UNIFIED_DIR"
+echo "Dataset ID:  ${DATASET_ID:-<all>}"
+echo "Skip quality:${SKIP_QUALITY}"
+echo "HF repo:     $HF_DATASET_REPO"
 
 mkdir -p "$RAW_DIR" "$UNIFIED_DIR"
 
@@ -52,6 +56,6 @@ fi
 echo "--- Step 4: Pushing to HuggingFace Hub ---"
 python data/scripts/push_to_hf.py \
     --metadata-csv "$UNIFIED_DIR/metadata.csv" \
-    --repo-id hssling/anemia-conjunctiva-nailbed
+    --repo-id "$HF_DATASET_REPO"
 
 echo "=== Pipeline complete ==="

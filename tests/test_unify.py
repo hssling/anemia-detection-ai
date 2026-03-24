@@ -108,3 +108,64 @@ def test_assign_splits_falls_back_from_tiny_combo_strata():
 
     out = _assign_splits(df)
     assert set(out["split"]) == {"train", "val", "test"}
+
+
+def test_unify_supports_excel_labels_and_stem_matching(tmp_path):
+    """Excel labels with stem-only image ids should still resolve to image files."""
+    from data.scripts.unify_datasets import unify_dataset
+
+    ds_dir = tmp_path / "raw" / "excel_dataset"
+    img_dir = ds_dir / "Anemic"
+    img_dir.mkdir(parents=True)
+    img = Image.fromarray(np.random.randint(80, 200, (120, 120, 3), dtype=np.uint8))
+    img.save(img_dir / "Image_001.png")
+
+    pd.DataFrame(
+        [{"IMAGE_ID": "Image_001", "HB_LEVEL": 9.8, "Severity": "Moderate"}]
+    ).to_excel(ds_dir / "Anemia_Data_Collection_Sheet.xlsx", index=False)
+
+    out_dir = tmp_path / "unified"
+    out_dir.mkdir()
+
+    unify_dataset(
+        dataset_id="excel_dataset",
+        source_dir=ds_dir,
+        output_dir=out_dir,
+        site="conjunctiva",
+        label_type="hb_and_binary",
+        hb_column="HB_LEVEL",
+        filename_column="IMAGE_ID",
+        labels_csv="Anemia_Data_Collection_Sheet.xlsx",
+        age_group="child",
+        anemia_class_column="Severity",
+    )
+
+    meta = pd.read_csv(out_dir / "excel_dataset_metadata.csv")
+    assert len(meta) == 1
+    assert meta.loc[0, "hb_value"] == 9.8
+    assert meta.loc[0, "anemia_class"] == "moderate"
+
+
+def test_binary_label_can_be_inferred_from_filename_when_folder_is_generic(tmp_path):
+    """Binary folder datasets should infer class from filename if the folder is generic."""
+    from data.scripts.unify_datasets import unify_dataset
+
+    ds_dir = tmp_path / "raw" / "nail_dataset" / "Fingernails"
+    ds_dir.mkdir(parents=True)
+    img = Image.fromarray(np.random.randint(80, 200, (120, 120, 3), dtype=np.uint8))
+    img.save(ds_dir / "Non-Anemic-Fin-001.png")
+    img.save(ds_dir / "Anemic-Fin-002.png")
+
+    out_dir = tmp_path / "unified"
+    out_dir.mkdir()
+
+    unify_dataset(
+        dataset_id="nail_dataset",
+        source_dir=tmp_path / "raw" / "nail_dataset",
+        output_dir=out_dir,
+        site="nailbed",
+        label_type="binary",
+    )
+
+    meta = pd.read_csv(out_dir / "nail_dataset_metadata.csv")
+    assert set(meta["anemia_class"]) == {"normal", "anemia"}

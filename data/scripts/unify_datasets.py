@@ -51,14 +51,31 @@ def assign_anemia_class(hb: float, age_group: str) -> str:
         return "severe"
 
 
-# Folder name patterns that indicate anemia-positive class
-_ANEMIA_FOLDER_KEYWORDS = {"anemia", "anaemia", "positive", "pos"}
+# Name patterns that indicate anemia-positive / anemia-negative class
+_ANEMIA_POSITIVE_KEYWORDS = {"anemia", "anaemia", "positive", "pos", "anemic", "anaemic"}
+_ANEMIA_NEGATIVE_KEYWORDS = {
+    "non-anemia",
+    "non_anaemia",
+    "non_anemia",
+    "nonanaemia",
+    "nonanemia",
+    "non-anemic",
+    "non_anaemic",
+    "nonanemic",
+    "nonanaemic",
+    "normal",
+    "negative",
+}
 
 
-def _is_anemia_folder(folder_name: str) -> bool:
-    """Return True if the folder name indicates anemia-positive class."""
-    name_lower = folder_name.lower()
-    return any(kw in name_lower for kw in _ANEMIA_FOLDER_KEYWORDS)
+def _infer_binary_label(*names: str) -> str:
+    """Infer binary anemia label from folder and/or filename."""
+    merged = " ".join(name.lower() for name in names if name)
+    if any(kw in merged for kw in _ANEMIA_NEGATIVE_KEYWORDS):
+        return "normal"
+    if any(kw in merged for kw in _ANEMIA_POSITIVE_KEYWORDS):
+        return "anemia"
+    return "normal"
 
 
 def _unify_from_folders(
@@ -79,10 +96,10 @@ def _unify_from_folders(
     for folder in sorted(source_dir.rglob("*")):
         if not folder.is_dir():
             continue
-        anemia_cls = "anemia" if _is_anemia_folder(folder.name) else "normal"
         for src_img in sorted(folder.iterdir()):
             if src_img.suffix.lower() not in img_extensions:
                 continue
+            anemia_cls = _infer_binary_label(folder.name, src_img.name)
             new_name = f"{dataset_id}_{site}_{idx:05d}.jpg"
             dest_img = output_dir / new_name
             shutil.copy2(src_img, dest_img)
@@ -113,6 +130,7 @@ def unify_dataset(
     filename_column: str = "filename",
     labels_csv: str = "labels.csv",
     age_group: str = "adult",
+    anemia_class_column: str | None = None,
 ) -> pathlib.Path:
     """
     Unify a single downloaded dataset into standard format.
@@ -123,21 +141,34 @@ def unify_dataset(
     labels_path = source_dir / labels_csv
 
     # Detect label format: try CSV first, fall back to folder-based
-    csv_candidates = list(source_dir.rglob("*.csv"))
-    if not labels_path.exists() and csv_candidates:
-        labels_path = csv_candidates[0]
-        log.warning(f"  Using {labels_path} as labels CSV")
+    spreadsheet_candidates = list(source_dir.rglob("*.csv")) + list(source_dir.rglob("*.xlsx")) + list(source_dir.rglob("*.xls"))
+    if not labels_path.exists():
+        named_candidates = list(source_dir.rglob(labels_csv))
+        if named_candidates:
+            labels_path = named_candidates[0]
+            log.warning(f"  Using {labels_path} as labels file")
+        elif spreadsheet_candidates:
+            labels_path = spreadsheet_candidates[0]
+            log.warning(f"  Using {labels_path} as labels file")
 
     if labels_path.exists():
         # --- CSV-based labels ---
-        df = pd.read_csv(labels_path)
+        if labels_path.suffix.lower() in {".xlsx", ".xls"}:
+            df = pd.read_excel(labels_path)
+        else:
+            df = pd.read_csv(labels_path)
         rows = []
         for idx, row in df.iterrows():
-            orig_filename = row[filename_column]
+            orig_filename = str(row[filename_column]).strip()
             src_img = None
             for candidate in source_dir.rglob(orig_filename):
                 src_img = candidate
                 break
+            if src_img is None and "." not in pathlib.Path(orig_filename).name:
+                for candidate in source_dir.rglob("*"):
+                    if candidate.is_file() and candidate.stem == orig_filename:
+                        src_img = candidate
+                        break
             if src_img is None or not src_img.exists():
                 log.warning(f"  Image not found: {orig_filename} -- skipping")
                 continue
@@ -149,7 +180,21 @@ def unify_dataset(
             hb_val = (
                 float(row[hb_column]) if hb_column in row and pd.notna(row[hb_column]) else None
             )
-            anemia_cls = assign_anemia_class(hb_val, age_group) if hb_val is not None else "unknown"
+            if anemia_class_column and anemia_class_column in row and pd.notna(row[anemia_class_column]):
+                raw_class = str(row[anemia_class_column]).strip().lower()
+                anemia_cls = {
+                    "non-anemic": "normal",
+                    "non anemic": "normal",
+                    "non-anemia": "normal",
+                    "normal": "normal",
+                    "mild": "mild",
+                    "moderate": "moderate",
+                    "severe": "severe",
+                    "anemia": "anemia",
+                    "anemic": "anemia",
+                }.get(raw_class, raw_class)
+            else:
+                anemia_cls = assign_anemia_class(hb_val, age_group) if hb_val is not None else "unknown"
 
             rows.append(
                 {
@@ -273,6 +318,11 @@ def main():
             output_dir=args.output_dir,
             site=dataset["site"],
             label_type=dataset["label_type"],
+            hb_column=dataset.get("hb_column", "hb"),
+            filename_column=dataset.get("filename_column", "filename"),
+            labels_csv=dataset.get("labels_csv", "labels.csv"),
+            age_group=dataset.get("age_group", "adult"),
+            anemia_class_column=dataset.get("anemia_class_column"),
         )
 
     merge_metadata(args.output_dir)

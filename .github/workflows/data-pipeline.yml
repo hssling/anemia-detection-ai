@@ -7,7 +7,7 @@ on:
       dataset_id:
         description: "Download only this dataset ID (leave blank for all)"
         required: false
-        default: ""
+        default: "cp_anemic_ghana"
       skip_download:
         description: "Skip download step (1=skip, 0=run)"
         required: false
@@ -15,7 +15,11 @@ on:
       skip_quality:
         description: "Skip quality filter (1=skip for small/test datasets, 0=run)"
         required: false
-        default: "0"
+        default: "1"
+      hf_dataset_repo:
+        description: "HF dataset repo to publish to"
+        required: false
+        default: "hssling/anemia-conjunctiva-nailbed"
 
 jobs:
   run-pipeline:
@@ -32,6 +36,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-data.txt
 
+      - name: Install archive extraction tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unar p7zip-full
+
       - name: Configure Kaggle credentials
         run: |
           mkdir -p ~/.kaggle
@@ -46,4 +55,5 @@ jobs:
           DATASET_ID: ${{ github.event.inputs.dataset_id }}
           SKIP_DOWNLOAD: ${{ github.event.inputs.skip_download }}
           SKIP_QUALITY: ${{ github.event.inputs.skip_quality }}
+          HF_DATASET_REPO: ${{ github.event.inputs.hf_dataset_repo }}
         run: bash data/data_pipeline.sh

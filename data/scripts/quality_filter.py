@@ -11,6 +11,7 @@ Returns a normalized quality score in [0, 1].
 """
 
 import logging
+import os
 import pathlib
 
 import cv2
@@ -20,10 +21,10 @@ from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-MIN_SHORT_EDGE = 1080
-MIN_LAPLACIAN_VARIANCE = 100.0
-MIN_MEAN_PIXEL = 40.0
-MAX_MEAN_PIXEL = 220.0
+MIN_SHORT_EDGE = int(os.getenv("QUALITY_MIN_SHORT_EDGE", "1080"))
+MIN_LAPLACIAN_VARIANCE = float(os.getenv("QUALITY_MIN_LAPLACIAN_VARIANCE", "100.0"))
+MIN_MEAN_PIXEL = float(os.getenv("QUALITY_MIN_MEAN_PIXEL", "40.0"))
+MAX_MEAN_PIXEL = float(os.getenv("QUALITY_MAX_MEAN_PIXEL", "220.0"))
 
 
 def compute_quality_score(image_path: str) -> float:

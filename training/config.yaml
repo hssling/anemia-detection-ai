@@ -3,6 +3,8 @@
 
 data:
   hf_dataset_repo: "hssling/anemia-conjunctiva-nailbed"
+  preferred_supervised_sources:
+    - cp_anemic_ghana
   image_size: 380          # EfficientNet-B4 canonical input
   batch_size: 32
   num_workers: 4

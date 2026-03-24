@@ -5,6 +5,39 @@
 
 datasets:
 
+  - id: cp_anemic_ghana
+    name: "CP-AnemiC (A Conjunctival Pallor) Dataset from Ghana"
+    source: mendeley
+    mendeley_id: "m53vz6b7fx"
+    version: 1
+    site: conjunctiva
+    label_type: hb_and_binary
+    labels_csv: "Anemia_Data_Collection_Sheet.xlsx"
+    filename_column: "IMAGE_ID"
+    hb_column: "HB_LEVEL"
+    anemia_class_column: "Severity"
+    age_group: child
+    notes: "Public Hb-labeled conjunctival dataset from Ghana; downloaded as zip containing a nested RAR archive"
+
+  - id: ghana_fingernails
+    name: "Detection of Anemia using Colour of the Fingernails Image Datasets from Ghana"
+    source: mendeley
+    mendeley_id: "2xx4j3kjg2"
+    version: 1
+    site: nailbed
+    label_type: binary
+    age_group: child
+    notes: "Public nail-bed binary dataset from Ghana; useful for binary pretraining but not Hb regression"
+
+  - id: imagehb_contact
+    name: "ImageHB"
+    source: manual
+    manual_url: "https://bdtd.github.io/ImageHB/"
+    site: conjunctiva
+    label_type: hb_and_binary
+    age_group: child
+    notes: "Large multi-site Hb-labeled dataset with conjunctiva, palm, tongue, and nailbed images; full cohort requires direct request, sample dataset available from the project site"
+
   - id: eyes_defy_anemia
     name: "Eyes Defy Anemia"
     source: kaggle

@@ -8,6 +8,20 @@ Unified dataset of conjunctival and nail-bed images for anemia screening.
 
 See `dataset_registry.yaml` for all source datasets.
 
+Current source types:
+- `kaggle`: direct Kaggle CLI download
+- `mendeley`: public Mendeley Data zip download, including nested `.rar` extraction
+- `manual`: contact/request dataset source; not auto-downloaded by the pipeline
+
+Hb-regression-capable public source currently wired:
+- `cp_anemic_ghana` (`m53vz6b7fx`): conjunctival images with measured Hb levels from Ghana
+
+Binary-only public source currently wired:
+- `ghana_fingernails` (`2xx4j3kjg2`): nail-bed images from Ghana, suitable for binary anemia classification or pretraining, not Hb regression
+
+High-value contact/manual source:
+- `imagehb_contact`: multi-site Hb-labeled pediatric dataset with conjunctiva, palm, tongue, and nailbed images; full dataset requires direct request via the project page
+
 ## Format
 
 `metadata.csv` columns:
