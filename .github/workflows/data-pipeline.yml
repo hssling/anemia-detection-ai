@@ -1,0 +1,45 @@
+# .github/workflows/data-pipeline.yml
+name: Data Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      dataset_id:
+        description: "Download only this dataset ID (leave blank for all)"
+        required: false
+        default: ""
+      skip_download:
+        description: "Skip download step (1=skip, 0=run)"
+        required: false
+        default: "0"
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-data.txt
+
+      - name: Configure Kaggle credentials
+        run: |
+          mkdir -p ~/.kaggle
+          echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' \
+            > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+
+      - name: Run data pipeline
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          DATASET_ID: ${{ github.event.inputs.dataset_id }}
+          SKIP_DOWNLOAD: ${{ github.event.inputs.skip_download }}
+        run: |
+          huggingface-cli login --token "$HF_TOKEN" --add-to-git-credential
+          bash data/data_pipeline.sh
