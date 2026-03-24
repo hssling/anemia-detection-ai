@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: anemia-detection-ai
+    name: anemia-detection-ai-1
     runtime: docker
     dockerfilePath: inference/Dockerfile
     envVars:

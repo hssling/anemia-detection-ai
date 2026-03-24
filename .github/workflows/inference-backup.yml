@@ -1,0 +1,44 @@
+name: Deploy Backup Inference to Render
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "inference/**"
+      - "training/models/**"
+      - "render.yaml"
+      - ".github/workflows/inference-backup.yml"
+
+env:
+  RENDER_SERVICE_ID: srv-d71bbgq4d50c73bjieog
+  RENDER_SERVICE_URL: https://anemia-detection-ai-1.onrender.com
+
+jobs:
+  deploy-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl -X POST "$RENDER_DEPLOY_HOOK_URL" \
+            -H "Accept: application/json" \
+            --fail-with-body
+
+      - name: Wait for Render service to be live
+        run: |
+          sleep 60
+          for i in $(seq 1 10); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+              "$RENDER_SERVICE_URL/health")
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Render service is live"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "Render service did not become healthy in time"
+          exit 1

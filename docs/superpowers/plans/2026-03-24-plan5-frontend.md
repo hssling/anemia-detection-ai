@@ -347,7 +347,7 @@ git commit -m "feat: add AnemiaScan mobile-first CSS"
 const PRIMARY_API  = window._ENV?.HF_SPACE_URL
   || "https://hssling-anemia-screening.hf.space/api/predict";
 const FALLBACK_API = window._ENV?.BACKUP_API_URL
-  || "https://anemia-detection-ai.onrender.com/api/predict";
+  || "https://anemia-detection-ai-1.onrender.com/api/predict";
 const TIMEOUT_MS    = 45_000;  // HF Spaces can be slow on cold start
 
 /**
@@ -973,7 +973,7 @@ In Netlify dashboard → Site settings → Environment variables:
 | Key | Value |
 |-----|-------|
 | `HF_SPACE_URL` | `https://hssling-anemia-screening.hf.space/api/predict` |
-| `BACKUP_API_URL` | `https://anemia-detection-ai.onrender.com/api/predict` |
+| `BACKUP_API_URL` | `https://anemia-detection-ai-1.onrender.com/api/predict` |
 
 - [ ] **Step 5: Trigger deploy and verify**
 
