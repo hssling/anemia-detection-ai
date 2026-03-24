@@ -1,0 +1,45 @@
+# data/dataset_registry.yaml
+# Declarative registry of all public anemia image datasets.
+# Each entry is fetched by download_datasets.py.
+
+datasets:
+
+  - id: lacuna_anemia
+    name: "Lacuna Fund Anemia Dataset"
+    source: kaggle
+    kaggle_id: "lacuna-fund/lacuna-anemia-dataset"
+    site: conjunctiva
+    label_type: hb_and_binary
+    notes: "African population; large conjunctival dataset with continuous Hb"
+
+  - id: kaggle_anemia_detection
+    name: "Anemia Detection from Eye Images"
+    source: kaggle
+    kaggle_id: "bishnukumarnaik/anemia-detection"
+    site: conjunctiva
+    label_type: binary
+    notes: "Binary anemia/non-anemic; conjunctival images"
+
+  - id: kaggle_anemia_eye
+    name: "Anemia Eye Dataset"
+    source: kaggle
+    kaggle_id: "suryatejreddy/anemia-eye-dataset"
+    site: conjunctiva
+    label_type: binary
+    notes: "Eye images for anemia detection"
+
+  - id: kaggle_nailbed
+    name: "Nail Anemia Detection"
+    source: kaggle
+    kaggle_id: "suryatejreddy/nail-anemia-detection"
+    site: nailbed
+    label_type: binary
+    notes: "Nail bed images for anemia classification"
+
+  - id: kaggle_anemia_images
+    name: "Anemia Classification Dataset"
+    source: kaggle
+    kaggle_id: "murtio/anemia-images"
+    site: conjunctiva
+    label_type: multiclass
+    notes: "Four-class anemia severity images"
