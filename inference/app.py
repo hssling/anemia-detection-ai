@@ -173,7 +173,6 @@ demo = gr.Interface(
         "and classify anemia severity. **Research tool only -- not a medical device.**"
     ),
     examples=[],
-    allow_flagging="never",
 )
 
 app = gr.mount_gradio_app(app, demo, path="/demo")
