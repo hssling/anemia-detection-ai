@@ -73,7 +73,7 @@ def health():
 async def predict(
     conjunctiva_image: UploadFile | None = File(default=None),
     nailbed_image: UploadFile | None = File(default=None),
-    _model: str = Form(default="ensemble"),
+    model_name: str = Form(default="ensemble"),
     include_gradcam: str = Form(default="false"),
 ):
     if conjunctiva_image is None and nailbed_image is None:
