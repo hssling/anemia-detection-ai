@@ -1,134 +1,240 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#9c2f1f">
+  <meta name="description" content="AnemiaScan is a research web app for non-invasive anemia screening from conjunctiva and nail-bed images.">
   <title>AnemiaScan</title>
-  <meta name="description" content="AnemiaScan frontend landing page and deployment links.">
-  <style>
-    :root {
-      --bg: #f5efe3;
-      --ink: #1f1a17;
-      --muted: #6a6158;
-      --accent: #b6402c;
-      --accent-dark: #8f2f1f;
-      --card: rgba(255, 252, 246, 0.92);
-      --line: rgba(31, 26, 23, 0.12);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Georgia, "Times New Roman", serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(182, 64, 44, 0.18), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(143, 47, 31, 0.16), transparent 24%),
-        linear-gradient(180deg, #f9f3e9 0%, var(--bg) 100%);
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-    main {
-      width: min(820px, 100%);
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 32px;
-      box-shadow: 0 24px 80px rgba(70, 45, 30, 0.12);
-    }
-    .eyebrow {
-      margin: 0 0 12px;
-      color: var(--accent);
-      font-size: 0.9rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(2.4rem, 6vw, 4.4rem);
-      line-height: 0.95;
-    }
-    p {
-      color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.6;
-      max-width: 62ch;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 28px;
-    }
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      background: rgba(255, 255, 255, 0.72);
-    }
-    .card h2 {
-      margin: 0 0 10px;
-      font-size: 1.1rem;
-    }
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 24px;
-    }
-    a.button {
-      display: inline-block;
-      padding: 12px 18px;
-      border-radius: 999px;
-      text-decoration: none;
-      font-weight: 700;
-      transition: transform 0.16s ease, background 0.16s ease;
-    }
-    a.button.primary {
-      background: var(--accent);
-      color: #fff8f4;
-    }
-    a.button.secondary {
-      border: 1px solid var(--line);
-      color: var(--ink);
-      background: rgba(255, 255, 255, 0.74);
-    }
-    a.button:hover {
-      transform: translateY(-1px);
-    }
-    code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.92em;
-    }
-  </style>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    window._ENV = {
+      PRIMARY_API_URL: "/api/predict",
+      BACKUP_API_URL: "https://anemia-detection-ai-1.onrender.com/api/predict",
+      HF_SPACE_URL: "https://hssling-anemia-screening.hf.space/api/predict"
+    };
+  </script>
 </head>
 <body>
-  <main>
-    <p class="eyebrow">AnemiaScan</p>
-    <h1>Frontend placeholder is live.</h1>
-    <p>
-      Netlify is now serving a real page. The full web app from Plan 5 has not been implemented in this
-      repository yet, so this site is currently a deployment landing page rather than the final screening UI.
-    </p>
-    <div class="actions">
-      <a class="button primary" href="https://huggingface.co/spaces/hssling/anemia-screening" target="_blank" rel="noreferrer">Open HF Space</a>
-      <a class="button secondary" href="https://anemia-detection-ai-1.onrender.com/health" target="_blank" rel="noreferrer">Check Render Health</a>
+  <div class="page-shell"></div>
+  <header class="app-header">
+    <div class="header-band"></div>
+    <div class="header-inner">
+      <div class="brand-lockup">
+        <p class="brand-kicker">ICMR Extramural Project</p>
+        <h1 class="app-title" data-i18n="title">AnemiaScan</h1>
+        <p class="app-subtitle">Research-grade screening UI for conjunctiva and nail-bed anemia assessment.</p>
+      </div>
+      <div class="header-actions">
+        <button id="lang-toggle" class="button button-ghost button-small" type="button">ಕನ್ನಡ</button>
+        <button id="mode-toggle" class="button button-ghost" type="button">Advanced Mode</button>
+      </div>
     </div>
-    <div class="grid">
-      <section class="card">
-        <h2>Primary inference</h2>
-        <p>Hugging Face Space: <code>hssling/anemia-screening</code></p>
+  </header>
+
+  <div class="alert-banner" role="alert" data-i18n="disclaimer">
+    Research tool only. This is not a certified diagnostic device. Clinical confirmation is required.
+  </div>
+
+  <main class="app-main">
+    <section id="screening-mode" class="mode-panel active">
+      <div class="hero-card">
+        <div class="hero-copy">
+          <p class="hero-kicker">Field Workflow</p>
+          <h2 class="hero-title">Capture two clean images, get a triage-ready estimate, and decide the next referral step fast.</h2>
+          <p class="hero-text">
+            Screening mode is optimized for quick mobile capture in outreach settings. If only one view is available,
+            the app will still attempt a prediction.
+          </p>
+        </div>
+        <div class="hero-side">
+          <div class="status-chip"><span class="status-dot"></span> Render backup live</div>
+          <p class="hero-side-copy">Primary Netlify proxy routes requests to the public Render inference service.</p>
+        </div>
+      </div>
+
+      <section class="panel capture-panel">
+        <div class="panel-head">
+          <div>
+            <p class="panel-kicker">Step 1</p>
+            <h3 class="panel-title">Capture Images</h3>
+          </div>
+          <p class="panel-note">Use natural light. Avoid blur, flash glare, and heavy shadows.</p>
+        </div>
+
+        <div class="capture-grid">
+          <article id="conj-card" class="capture-card">
+            <div class="capture-ornament"></div>
+            <div class="capture-meta">
+              <p class="capture-label" data-i18n="conjunctiva">Conjunctiva</p>
+              <p class="capture-hint" data-i18n="conj_hint">Lower eyelid, gently everted</p>
+            </div>
+            <input id="conj-input" type="file" accept="image/*" capture="environment" hidden>
+            <button class="button button-soft capture-trigger" type="button" data-target="conj-input" data-i18n="capture_button">Capture / Upload</button>
+            <img id="conj-preview" class="image-preview" alt="Conjunctiva preview" hidden>
+            <button id="conj-clear" class="text-link" type="button" hidden>Clear image</button>
+          </article>
+
+          <article id="nail-card" class="capture-card">
+            <div class="capture-ornament nail"></div>
+            <div class="capture-meta">
+              <p class="capture-label" data-i18n="nailbed">Nail Bed</p>
+              <p class="capture-hint" data-i18n="nail_hint">Index finger, extended and steady</p>
+            </div>
+            <input id="nail-input" type="file" accept="image/*" capture="environment" hidden>
+            <button class="button button-soft capture-trigger" type="button" data-target="nail-input" data-i18n="capture_button">Capture / Upload</button>
+            <img id="nail-preview" class="image-preview" alt="Nail bed preview" hidden>
+            <button id="nail-clear" class="text-link" type="button" hidden>Clear image</button>
+          </article>
+        </div>
+
+        <div class="action-row">
+          <button id="analyze-btn" class="button button-primary button-wide" type="button" disabled data-i18n="analyze">Analyze</button>
+          <p class="action-hint">At least one image is required. Conjunctiva is the most reliable currently deployed model.</p>
+        </div>
       </section>
-      <section class="card">
-        <h2>Backup inference</h2>
-        <p>Render service: <code>https://anemia-detection-ai-1.onrender.com</code></p>
+
+      <div id="loading" class="loading-state" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <p data-i18n="loading">Analyzing image...</p>
+      </div>
+
+      <div id="error-banner" class="error-banner" hidden></div>
+
+      <section id="result-card" class="panel result-panel" hidden>
+        <div class="panel-head">
+          <div>
+            <p class="panel-kicker">Step 2</p>
+            <h3 class="panel-title">Screening Result</h3>
+          </div>
+          <div id="result-source" class="result-source"></div>
+        </div>
+
+        <div class="result-layout">
+          <div class="result-primary">
+            <p class="result-label" data-i18n="estimated_hb">Estimated Hb</p>
+            <div class="result-value-wrap">
+              <span id="result-hb-value" class="result-hb">--</span>
+              <span class="result-unit">g/dL</span>
+            </div>
+            <p id="result-ci" class="result-ci"></p>
+            <div id="result-badge" class="result-badge">Pending</div>
+          </div>
+
+          <div class="result-secondary">
+            <div class="metric-card">
+              <p class="metric-label" data-i18n="confidence">Confidence</p>
+              <p id="result-confidence-value" class="metric-value">--</p>
+            </div>
+            <div class="metric-card">
+              <p class="metric-label">Recommended action</p>
+              <p id="result-referral" class="referral-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="probability-block">
+          <div class="probability-head">
+            <p class="panel-kicker">Class probabilities</p>
+          </div>
+          <div id="probability-bars" class="probability-bars"></div>
+        </div>
+
+        <div id="result-warning" class="subtle-warning" hidden></div>
       </section>
-      <section class="card">
-        <h2>Frontend status</h2>
-        <p>The Netlify deploy was publishing an empty <code>frontend/</code> directory. This page fixes that.</p>
+    </section>
+
+    <section id="advanced-mode" class="mode-panel">
+      <div class="hero-card advanced-hero">
+        <div class="hero-copy">
+          <p class="hero-kicker">Research Mode</p>
+          <h2 class="hero-title">Inspect class probabilities, per-model output, warnings, and the raw JSON payload.</h2>
+          <p class="hero-text">Use this view for validation runs, demos, and model-behavior checks.</p>
+        </div>
+      </div>
+
+      <section class="panel advanced-panel">
+        <div class="panel-head">
+          <div>
+            <p class="panel-kicker">Inputs</p>
+            <h3 class="panel-title">Inference Controls</h3>
+          </div>
+        </div>
+
+        <div class="advanced-controls">
+          <label class="control-field">
+            <span>Conjunctiva image</span>
+            <input id="adv-conj-input" type="file" accept="image/*">
+          </label>
+          <label class="control-field">
+            <span>Nail-bed image</span>
+            <input id="adv-nail-input" type="file" accept="image/*">
+          </label>
+          <label class="control-field">
+            <span>Inference mode</span>
+            <select id="model-select">
+              <option value="ensemble">Ensemble</option>
+              <option value="conjunctiva">Conjunctiva only</option>
+              <option value="nailbed">Nail-bed only</option>
+            </select>
+          </label>
+          <div class="control-field checkbox-field">
+            <label>
+              <input id="include-gradcam" type="checkbox">
+              <span>Request Grad-CAM when supported</span>
+            </label>
+          </div>
+          <button id="adv-analyze-btn" class="button button-primary" type="button">Run analysis</button>
+        </div>
       </section>
-    </div>
+
+      <div id="adv-loading" class="loading-state" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Running advanced analysis...</p>
+      </div>
+
+      <div id="adv-error" class="error-banner" hidden></div>
+
+      <section id="adv-results" class="advanced-results" hidden>
+        <div class="panel advanced-table-panel">
+          <div class="panel-head">
+            <h3 class="panel-title">Summary</h3>
+          </div>
+          <table id="adv-results-table" class="results-table"></table>
+        </div>
+
+        <div class="panel advanced-table-panel">
+          <div class="panel-head">
+            <h3 class="panel-title">Per-model breakdown</h3>
+          </div>
+          <table id="adv-permodel-table" class="results-table"></table>
+        </div>
+
+        <div class="panel advanced-table-panel">
+          <div class="panel-head">
+            <h3 class="panel-title">Raw payload</h3>
+            <button id="export-json-btn" class="button button-ghost button-small" type="button">Export JSON</button>
+          </div>
+          <pre id="adv-json" class="json-preview"></pre>
+        </div>
+      </section>
+    </section>
   </main>
+
+  <footer class="app-footer">
+    <div>
+      <p>AnemiaScan · Netlify frontend · HF Space + Render inference stack</p>
+      <p class="footer-links">
+        <a href="https://github.com/hssling/anemia-detection-ai" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://huggingface.co/spaces/hssling/anemia-screening" target="_blank" rel="noreferrer">HF Space</a>
+        <a href="https://anemia-detection-ai-1.onrender.com/health" target="_blank" rel="noreferrer">Render health</a>
+      </p>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
