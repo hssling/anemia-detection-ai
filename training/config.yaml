@@ -1,0 +1,40 @@
+# training/config.yaml
+# AnemiaScan EfficientNet-B4 training configuration
+
+model:
+  architecture: efficientnet_b4
+  pretrained: true
+  num_classes: 1          # regression: Hb g/dL
+  dropout: 0.3
+
+data:
+  conjunctiva_repo: hssling/anemia-conjunctiva-dataset
+  nailbed_repo: hssling/anemia-nailbed-dataset
+  image_size: 380
+  batch_size: 32
+  num_workers: 4
+  val_split: 0.2
+  augmentation:
+    horizontal_flip: true
+    random_rotation: 15
+    color_jitter: true
+
+training:
+  epochs: 50
+  optimizer: adamw
+  learning_rate: 3.0e-4
+  weight_decay: 1.0e-4
+  scheduler: cosine_annealing
+  early_stopping_patience: 10
+  mixed_precision: true
+  gradient_clip: 1.0
+
+cross_validation:
+  n_folds: 5
+  stratify_by: anemia_severity
+
+output:
+  conjunctiva_repo: hssling/anemia-efficientnet-b4-conjunctiva
+  nailbed_repo: hssling/anemia-efficientnet-b4-nailbed
+  ensemble_repo: hssling/anemia-ensemble
+  push_to_hub: true
