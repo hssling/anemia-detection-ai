@@ -2,6 +2,7 @@
 Smoke tests - verify the package structure is importable and config is valid.
 These tests have zero ML dependencies and must pass in any Python 3.11 environment.
 """
+
 import importlib
 import pathlib
 import tomllib
