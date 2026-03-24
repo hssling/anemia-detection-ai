@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  SECRETS_SCAN_OMIT_PATHS = ".github/workflows,docs,kaggle_notebook.ipynb,render.yaml,data/README.md"
+  SECRETS_SCAN_OMIT_KEYS = "HF_TOKEN,KAGGLE_KEY,KAGGLE_USERNAME,WANDB_API_KEY,RENDER_DEPLOY_HOOK_URL"
 
 [[headers]]
   for = "/*"
