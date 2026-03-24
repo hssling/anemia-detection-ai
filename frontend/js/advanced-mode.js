@@ -1,5 +1,6 @@
 // frontend/js/advanced-mode.js
 import { predict } from "./api.js";
+import { t } from "./i18n.js";
 
 export function initAdvancedMode() {
   const conjBtn     = document.getElementById("adv-conj-btn");
@@ -44,7 +45,7 @@ export function initAdvancedMode() {
       lastResult = result;
       _renderResult(result);
     } catch (err) {
-      alert(`Prediction failed: ${err.message}`);
+      _renderError(err.message);
     } finally {
       spinner.classList.add("hidden");
       analyseBtn.disabled = !conjFile && !nailFile;
@@ -64,7 +65,12 @@ export function initAdvancedMode() {
     }
     for (const [label, val] of rows) {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${label}</td><td>${val}</td>`;
+      const tdLabel = document.createElement("td");
+      const tdVal = document.createElement("td");
+      tdLabel.textContent = label;
+      tdVal.textContent = val;
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdVal);
       tbody.appendChild(tr);
     }
 
@@ -73,14 +79,31 @@ export function initAdvancedMode() {
     for (const [site, siteResult] of Object.entries(result.per_model || {})) {
       const section = document.createElement("div");
       section.className = "per-model-section";
-      section.innerHTML = `
-        <h4>${site}</h4>
-        <p>Hb: ${siteResult.hb_estimate} g/dL (CI: ${siteResult.hb_ci_95[0]}–${siteResult.hb_ci_95[1]})</p>
-        <p>Class: ${siteResult.classification}</p>
-      `;
+      const h4 = document.createElement("h4");
+      h4.textContent = site;
+      const p1 = document.createElement("p");
+      p1.textContent = `Hb: ${siteResult.hb_estimate} g/dL (CI: ${siteResult.hb_ci_95[0]}–${siteResult.hb_ci_95[1]})`;
+      const p2 = document.createElement("p");
+      p2.textContent = `Class: ${siteResult.classification}`;
+      section.appendChild(h4);
+      section.appendChild(p1);
+      section.appendChild(p2);
       perModelDiv.appendChild(section);
     }
 
+    advResult.classList.remove("hidden");
+  }
+
+  function _renderError(msg) {
+    const tbody = document.getElementById("result-tbody");
+    tbody.innerHTML = "";
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 2;
+    td.textContent = `${t("predFailed")}: ${msg}`;
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    document.getElementById("per-model-div").innerHTML = "";
     advResult.classList.remove("hidden");
   }
 

@@ -1,6 +1,6 @@
 [build]
   command = "node scripts/inject-env.js"
-  publish = "frontend"
+  publish = "dist"
 
 [[headers]]
   for = "/*"

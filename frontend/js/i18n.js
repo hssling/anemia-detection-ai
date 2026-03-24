@@ -16,6 +16,12 @@ const STRINGS = {
     perModelHeader: "Per-Model Results",
     exportBtn: "Export JSON",
     retryMsg: "Please try again or contact support.",
+    predFailed: "Prediction failed",
+    badgeNormal: "Normal",
+    badgeMild: "Mild Anaemia",
+    badgeModerate: "Moderate Anaemia",
+    badgeSevere: "Severe Anaemia",
+    confidenceMsg: "Model confidence:",
     referral: {
       normal: "✅ Haemoglobin within normal range. No immediate referral needed.",
       mild: "⚠️ Mild anaemia detected. Dietary advice and follow-up recommended.",
@@ -39,6 +45,12 @@ const STRINGS = {
     perModelHeader: "ಪ್ರತಿ-ಮಾದರಿ ಫಲಿತಾಂಶ",
     exportBtn: "JSON ರಫ್ತು",
     retryMsg: "ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಬೆಂಬಲ ಸಂಪರ್ಕಿಸಿ.",
+    predFailed: "ಮುನ್ಸೂಚನೆ ವಿಫಲವಾಯಿತು",
+    badgeNormal: "ಸಾಮಾನ್ಯ",
+    badgeMild: "ಸಣ್ಣ ರಕ್ತಹೀನತೆ",
+    badgeModerate: "ಮಧ್ಯಮ ರಕ್ತಹೀನತೆ",
+    badgeSevere: "ತೀವ್ರ ರಕ್ತಹೀನತೆ",
+    confidenceMsg: "ಮಾದರಿ ವಿಶ್ವಾಸ:",
     referral: {
       normal: "✅ ಹಿಮೋಗ್ಲೋಬಿನ್ ಸಾಮಾನ್ಯ ಮಿತಿಯಲ್ಲಿದೆ. ತಕ್ಷಣದ ಉಲ್ಲೇಖ ಅಗತ್ಯವಿಲ್ಲ.",
       mild: "⚠️ ಸಣ್ಣ ರಕ್ತಹೀನತೆ ಕಂಡಿದೆ. ಆಹಾರ ಸಲಹೆ ಮತ್ತು ಅನುಸರಣೆ ಶಿಫಾರಸು.",
@@ -56,6 +68,11 @@ export function t(key) {
 
 export function tReferral(cls) {
   return STRINGS[currentLang]?.referral?.[cls] ?? STRINGS.en.referral[cls] ?? "";
+}
+
+export function tBadge(cls) {
+  const key = `badge${cls.charAt(0).toUpperCase()}${cls.slice(1)}`;
+  return t(key) || cls;
 }
 
 export function setLang(lang) {

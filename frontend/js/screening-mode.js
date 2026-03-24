@@ -1,8 +1,6 @@
 // frontend/js/screening-mode.js
 import { predict } from "./api.js";
-import { t, tReferral } from "./i18n.js";
-
-const BADGE_LABELS = { normal: "Normal", mild: "Mild Anaemia", moderate: "Moderate Anaemia", severe: "Severe Anaemia" };
+import { t, tReferral, tBadge } from "./i18n.js";
 
 export function initScreeningMode() {
   const conjBtn   = document.getElementById("conj-btn");
@@ -65,14 +63,14 @@ export function initScreeningMode() {
     hbEl.textContent = `${result.hb_estimate} g/dL`;
     ciEl.textContent  = `(95% CI: ${result.hb_ci_95[0]}–${result.hb_ci_95[1]})`;
 
-    badge.textContent = BADGE_LABELS[cls] || cls;
+    badge.textContent = tBadge(cls);
     badge.className = `result-badge ${cls}`;
 
     referral.textContent = tReferral(cls);
 
     const probs = result.class_probabilities;
     const pct = Math.round((probs[cls] || 0) * 100);
-    confidence.textContent = `Model confidence: ${pct}%`;
+    confidence.textContent = `${t("confidenceMsg")} ${pct}%`;
 
     resultCard.classList.remove("hidden");
   }

@@ -17,6 +17,10 @@ const modeToggleBtn = document.getElementById("mode-toggle");
 const screeningPanel = document.getElementById("screening-panel");
 const advancedPanel = document.getElementById("advanced-panel");
 
+if (!modeToggleBtn || !screeningPanel || !advancedPanel) {
+  console.error("app.js: required DOM elements not found");
+} else {
+
 let advancedMode = false;
 
 modeToggleBtn.addEventListener("click", () => {
@@ -36,3 +40,4 @@ modeToggleBtn.addEventListener("click", () => {
 initScreeningMode();
 initAdvancedMode();
 initI18n();
+}

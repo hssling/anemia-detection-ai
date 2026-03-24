@@ -1,0 +1,32 @@
+# Build output — never commit
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.pth
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML artefacts
+outputs/
+*.safetensors
+wandb/
+
+# Node
+node_modules/
