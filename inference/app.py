@@ -116,7 +116,7 @@ def health():
 
 @app.get("/")
 def root():
-    return RedirectResponse(url="/demo")
+    return RedirectResponse(url="/demo/")
 
 
 @app.post("/api/predict")
