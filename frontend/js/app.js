@@ -67,17 +67,20 @@ function initModeToggle() {
 }
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    const register = () => {
-      navigator.serviceWorker.register("./service-worker.js").catch((error) => {
-        console.warn("Service worker registration failed", error);
-      });
-    };
-
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(register);
-    } else {
-      window.setTimeout(register, 800);
+  window.addEventListener("load", async () => {
+    try {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(
+          keys
+            .filter((key) => key.startsWith("anemiascan-shell-"))
+            .map((key) => caches.delete(key)),
+        );
+      }
+    } catch (error) {
+      console.warn("Service worker cleanup failed", error);
     }
   });
 }
