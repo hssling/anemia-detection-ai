@@ -21,6 +21,7 @@ HF_REPOS = {
     "conjunctiva": os.getenv("HF_CONJ_MODEL_REPO", "hssling/anemia-efficientnet-b4-conjunctiva"),
     "nailbed": os.getenv("HF_NAIL_MODEL_REPO", "hssling/anemia-efficientnet-b4-nailbed"),
 }
+HF_TOKEN = os.getenv("HF_TOKEN") or os.getenv("HUGGING_FACE_HUB_TOKEN")
 
 DEVICE = torch.device("cpu")  # HF Spaces free tier is CPU-only
 
@@ -35,7 +36,7 @@ def load_model(site: str) -> AnemiaModel:
         raise ValueError(f"Unknown site: {site!r}. Must be 'conjunctiva' or 'nailbed'.")
 
     log.info(f"Downloading model weights from {repo_id} ...")
-    ckpt_path = hf_hub_download(repo_id=repo_id, filename="model.safetensors")
+    ckpt_path = hf_hub_download(repo_id=repo_id, filename="model.safetensors", token=HF_TOKEN)
     model = AnemiaModel(pretrained=False)
     state_dict = load_file(ckpt_path, device="cpu")
     model.load_state_dict(state_dict)

@@ -1,6 +1,5 @@
 const PRIMARY_API = window._ENV?.PRIMARY_API_URL || "/api/predict";
 const FALLBACK_API = window._ENV?.BACKUP_API_URL || "https://anemia-detection-ai-1.onrender.com/api/predict";
-const HF_API = window._ENV?.HF_SPACE_URL || "https://hssling-anemia-screening.hf.space/api/predict";
 const TIMEOUT_MS = 45000;
 
 function makeTimedRequest(url, body) {
@@ -33,7 +32,6 @@ export async function predict(conjFile, nailFile, model = "ensemble", includeGra
   const attempts = [
     { label: "Netlify proxy", url: PRIMARY_API },
     { label: "Render backup", url: FALLBACK_API },
-    { label: "HF Space", url: HF_API },
   ];
   const errors = [];
 
