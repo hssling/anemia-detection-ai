@@ -150,6 +150,7 @@ body {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .button {
@@ -182,6 +183,32 @@ body {
   background: linear-gradient(135deg, var(--accent-soft), color-mix(in srgb, var(--surface-strong) 76%, transparent));
   color: var(--accent-dark);
   border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--surface-strong) 78%, transparent), color-mix(in srgb, var(--accent-soft) 80%, transparent));
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.theme-toggle-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 .button-small { padding: 10px 14px; font-size: 0.85rem; }
@@ -268,6 +295,25 @@ body {
   border-radius: 22px;
   background: var(--surface-muted);
   border: 1px solid var(--line);
+}
+
+.hero-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.theme-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 72%, transparent);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 .status-chip {
@@ -594,7 +640,9 @@ body {
   .result-hb { font-size: 3.1rem; }
   .probability-row { grid-template-columns: 74px 1fr 52px; font-size: 0.86rem; }
   .header-actions { width: 100%; justify-content: stretch; }
-  .header-actions .button { flex: 1 1 auto; }
+  .header-actions .button,
+  .header-actions .theme-toggle { flex: 1 1 auto; justify-content: center; }
   .button-wide { width: 100%; min-width: 0; }
   .action-row { align-items: stretch; }
+  .theme-toggle { width: 100%; }
 }

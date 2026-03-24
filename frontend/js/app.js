@@ -13,8 +13,12 @@ function applyTheme(theme) {
     theme === "dark" ? "#141d29" : "#9c2f1f",
   );
   const themeToggle = document.getElementById("theme-toggle");
+  const themeToggleLabel = document.getElementById("theme-toggle-label");
   if (themeToggle) {
-    themeToggle.textContent = theme === "dark" ? "Light" : "Dark";
+    themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+  }
+  if (themeToggleLabel) {
+    themeToggleLabel.textContent = theme === "dark" ? "Dark Mode" : "Light Mode";
   }
   localStorage.setItem(THEME_KEY, theme);
 }
