@@ -38,8 +38,7 @@ jobs:
       - name: Run data pipeline
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HUGGING_FACE_HUB_TOKEN: ${{ secrets.HF_TOKEN }}
           DATASET_ID: ${{ github.event.inputs.dataset_id }}
           SKIP_DOWNLOAD: ${{ github.event.inputs.skip_download }}
-        run: |
-          huggingface-cli login --token "$HF_TOKEN" --add-to-git-credential
-          bash data/data_pipeline.sh
+        run: bash data/data_pipeline.sh
