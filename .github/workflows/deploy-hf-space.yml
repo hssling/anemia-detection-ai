@@ -1,49 +1,70 @@
-# .github/workflows/deploy-hf-space.yml
 name: Deploy to HF Space
+
+env:
+  HF_SPACE_ID: hssling/anemia-screening
 
 on:
   workflow_dispatch:
   push:
     paths:
       - "inference/**"
-      - "training/models/**"
+      - "training/**"
+      - ".github/workflows/deploy-hf-space.yml"
     branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install huggingface_hub
+      - name: Install deploy dependency
         run: pip install huggingface_hub
 
-      - name: Push inference code to HF Space
+      - name: Build Space payload
+        shell: bash
+        run: |
+          rm -rf .hf-space
+          mkdir -p .hf-space
+          cp inference/Dockerfile .hf-space/Dockerfile
+          cp -R inference .hf-space/inference
+          cp -R training .hf-space/training
+          cat <<'EOF' > .hf-space/README.md
+          ---
+          title: AnemiaScan
+          emoji: 🩸
+          colorFrom: red
+          colorTo: pink
+          sdk: docker
+          app_port: 7860
+          pinned: false
+          license: mit
+          ---
+
+          # AnemiaScan
+
+          Research-only non-invasive anemia screening demo.
+          EOF
+
+      - name: Upload to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python - <<'EOF'
-          from huggingface_hub import HfApi
+          python - <<'PY'
           import os
+          from huggingface_hub import HfApi
+
           api = HfApi(token=os.environ["HF_TOKEN"])
           api.upload_folder(
-              folder_path="inference",
-              repo_id="hssling/anemia-screening",
+              folder_path=".hf-space",
+              repo_id=os.environ["HF_SPACE_ID"],
               repo_type="space",
-              path_in_repo="inference",
-              commit_message="Deploy inference update from GitHub Actions",
+              commit_message="Deploy inference service from GitHub Actions",
           )
-          api.upload_folder(
-              folder_path="training",
-              repo_id="hssling/anemia-screening",
-              repo_type="space",
-              path_in_repo="training",
-              commit_message="Sync training package",
-          )
-          print("HF Space updated")
-          EOF
+          print(f"HF Space updated: {os.environ['HF_SPACE_ID']}")
+          PY
