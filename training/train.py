@@ -77,7 +77,7 @@ def run_epoch(model, loader, optimizer, device, training: bool, config: dict):
                 loss.backward()
                 optimizer.step()
             total_loss += loss.item()
-            hb_preds.extend(hb_pred.squeeze().cpu().numpy().tolist())
+            hb_preds.extend(hb_pred.squeeze(1).cpu().numpy().tolist())
             hb_trues.extend(hb.cpu().numpy().tolist())
             cls_preds.extend(torch.softmax(cls_logits, dim=1).cpu().numpy().tolist())
             cls_trues.extend(cls.cpu().numpy().tolist())

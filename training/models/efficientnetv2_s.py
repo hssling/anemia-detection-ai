@@ -36,3 +36,10 @@ class AnemiaModel(nn.Module):
         for block in blocks[-n:]:
             for p in block.parameters():
                 p.requires_grad = True
+        # Also unfreeze final conv + bn for consistent gradient flow with B4
+        if hasattr(self.backbone, "conv_head"):
+            for p in self.backbone.conv_head.parameters():
+                p.requires_grad = True
+        if hasattr(self.backbone, "bn2"):
+            for p in self.backbone.bn2.parameters():
+                p.requires_grad = True

@@ -57,7 +57,18 @@ class AnemiaEnsemble(nn.Module):
         val_rows_nail: list,
         config: dict,
     ) -> tuple[float, float]:
-        """Grid search over ensemble weights on validation set. Returns (w_conj, w_nail)."""
+        """Grid search over ensemble weights on validation set. Returns (w_conj, w_nail).
+
+        IMPORTANT: val_rows_conj and val_rows_nail must be from the same patients
+        in the same order. The ensemble MAE is evaluated against conjunctiva ground-truth
+        (trues_c). Only valid when both sets cover the same patient population.
+        """
+        if len(val_rows_conj) != len(val_rows_nail):
+            raise ValueError(
+                f"val_rows_conj ({len(val_rows_conj)}) and val_rows_nail "
+                f"({len(val_rows_nail)}) must have the same length for ensemble "
+                "weight grid search. Ensure both cover the same patients."
+            )
         import numpy as np
         from torch.utils.data import DataLoader
 
@@ -81,7 +92,7 @@ class AnemiaEnsemble(nn.Module):
             with torch.no_grad():
                 for imgs, hb, _ in loader:
                     hb_pred, _ = model(imgs.to(device))
-                    preds.extend(hb_pred.squeeze().cpu().numpy())
+                    preds.extend(hb_pred.squeeze(1).cpu().numpy())
                     trues.extend(hb.numpy())
             return np.array(preds), np.array(trues)
 
