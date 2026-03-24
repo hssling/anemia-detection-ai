@@ -1,45 +1,54 @@
 # data/dataset_registry.yaml
 # Declarative registry of all public anemia image datasets.
 # Each entry is fetched by download_datasets.py.
+# All kaggle_ids verified 2026-03-24.
 
 datasets:
 
-  - id: lacuna_anemia
-    name: "Lacuna Fund Anemia Dataset"
+  - id: eyes_defy_anemia
+    name: "Eyes Defy Anemia"
     source: kaggle
-    kaggle_id: "lacuna-fund/lacuna-anemia-dataset"
-    site: conjunctiva
-    label_type: hb_and_binary
-    notes: "African population; large conjunctival dataset with continuous Hb"
-
-  - id: kaggle_anemia_detection
-    name: "Anemia Detection from Eye Images"
-    source: kaggle
-    kaggle_id: "bishnukumarnaik/anemia-detection"
+    kaggle_id: "harshwardhanfartale/eyes-defy-anemia"
     site: conjunctiva
     label_type: binary
-    notes: "Binary anemia/non-anemic; conjunctival images"
+    notes: "Large conjunctival dataset; 666 GB — use --dataset-id for selective download in CI"
 
-  - id: kaggle_anemia_eye
-    name: "Anemia Eye Dataset"
+  - id: eye_conjunctiva
+    name: "Eye-Conjunctiva Dataset"
     source: kaggle
-    kaggle_id: "suryatejreddy/anemia-eye-dataset"
+    kaggle_id: "nadiwidi/eyeconjunctiva"
     site: conjunctiva
     label_type: binary
-    notes: "Eye images for anemia detection"
+    notes: "Conjunctival images; 1.7 MB — suitable for CI pipeline test"
 
-  - id: kaggle_nailbed
-    name: "Nail Anemia Detection"
+  - id: anemiadataset
+    name: "Eye Images Dataset (Anemia Prediction)"
     source: kaggle
-    kaggle_id: "suryatejreddy/nail-anemia-detection"
-    site: nailbed
-    label_type: binary
-    notes: "Nail bed images for anemia classification"
-
-  - id: kaggle_anemia_images
-    name: "Anemia Classification Dataset"
-    source: kaggle
-    kaggle_id: "murtio/anemia-images"
+    kaggle_id: "nahiyan1402/anemiadataset"
     site: conjunctiva
-    label_type: multiclass
-    notes: "Four-class anemia severity images"
+    label_type: binary
+    notes: "Eye images for anemia prediction; 2.2 MB"
+
+  - id: balanced_conjunctiva
+    name: "Balanced Conjunctiva Dataset"
+    source: kaggle
+    kaggle_id: "ramya125g/balanced-conjunctiva-dataset"
+    site: conjunctiva
+    label_type: binary
+    notes: "Balanced conjunctival images; 111 MB"
+
+  - id: eye_anemia_recent
+    name: "Eye Anemia Dataset (2026)"
+    source: kaggle
+    kaggle_id: "dratehillary/eye-anemia-dataset"
+    site: conjunctiva
+    label_type: binary
+    notes: "Recent conjunctival dataset; 1.8 MB"
+
+  - id: anemia_palpebral
+    name: "Anemia Palpebral"
+    source: kaggle
+    kaggle_id: "adityachourasia1/anemia-palpebral"
+    site: conjunctiva
+    label_type: binary
+    notes: "Palpebral conjunctival images; 527 MB — includes nail-bed subset"
