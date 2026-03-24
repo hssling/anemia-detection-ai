@@ -15,6 +15,7 @@ const STRINGS = {
     valueHeader: "Value",
     perModelHeader: "Per-Model Results",
     exportBtn: "Export JSON",
+    retryMsg: "Please try again or contact support.",
     referral: {
       normal: "✅ Haemoglobin within normal range. No immediate referral needed.",
       mild: "⚠️ Mild anaemia detected. Dietary advice and follow-up recommended.",
@@ -37,6 +38,7 @@ const STRINGS = {
     valueHeader: "ಮೌಲ್ಯ",
     perModelHeader: "ಪ್ರತಿ-ಮಾದರಿ ಫಲಿತಾಂಶ",
     exportBtn: "JSON ರಫ್ತು",
+    retryMsg: "ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಬೆಂಬಲ ಸಂಪರ್ಕಿಸಿ.",
     referral: {
       normal: "✅ ಹಿಮೋಗ್ಲೋಬಿನ್ ಸಾಮಾನ್ಯ ಮಿತಿಯಲ್ಲಿದೆ. ತಕ್ಷಣದ ಉಲ್ಲೇಖ ಅಗತ್ಯವಿಲ್ಲ.",
       mild: "⚠️ ಸಣ್ಣ ರಕ್ತಹೀನತೆ ಕಂಡಿದೆ. ಆಹಾರ ಸಲಹೆ ಮತ್ತು ಅನುಸರಣೆ ಶಿಫಾರಸು.",

@@ -83,7 +83,7 @@ export function initScreeningMode() {
     document.getElementById("ci-value").textContent = "";
     document.getElementById("result-badge").textContent = msg;
     document.getElementById("result-badge").className = "result-badge moderate";
-    document.getElementById("referral-msg").textContent = "Please try again or contact support.";
+    document.getElementById("referral-msg").textContent = t("retryMsg");
     document.getElementById("confidence-msg").textContent = "";
     document.getElementById("result-card").classList.remove("hidden");
   }
