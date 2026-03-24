@@ -56,17 +56,18 @@ def push_all_models(
         "conjunctiva",
         config,
     )
-    push_model(
-        nail_ckpt,
-        "hssling/anemia-efficientnet-b4-nailbed",
-        cv_summary_nail,
-        "efficientnet_b4",
-        "nailbed",
-        config,
-    )
+    if nail_ckpt is not None:
+        push_model(
+            nail_ckpt,
+            "hssling/anemia-efficientnet-b4-nailbed",
+            cv_summary_nail,
+            "efficientnet_b4",
+            "nailbed",
+            config,
+        )
     ensemble_meta = {
         "conj_model": "hssling/anemia-efficientnet-b4-conjunctiva",
-        "nail_model": "hssling/anemia-efficientnet-b4-nailbed",
+        "nail_model": "hssling/anemia-efficientnet-b4-nailbed" if nail_ckpt else None,
         "w_conj": w_conj,
         "w_nail": w_nail,
     }
