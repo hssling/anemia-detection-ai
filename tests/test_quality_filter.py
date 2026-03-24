@@ -7,17 +7,17 @@ def test_sharp_image_passes(synthetic_conjunctiva_image):
 
     score = compute_quality_score(str(synthetic_conjunctiva_image))
     assert score > 0.0, "Quality score must be positive"
-    assert passes_quality_check(
-        str(synthetic_conjunctiva_image)
-    ), "Sharp synthetic image should pass quality check"
+    assert passes_quality_check(str(synthetic_conjunctiva_image)), (
+        "Sharp synthetic image should pass quality check"
+    )
 
 
 def test_blurry_image_fails(blurry_image):
     from data.scripts.quality_filter import passes_quality_check
 
-    assert not passes_quality_check(
-        str(blurry_image)
-    ), "Uniform (blurry) image should fail quality check"
+    assert not passes_quality_check(str(blurry_image)), (
+        "Uniform (blurry) image should fail quality check"
+    )
 
 
 def test_tiny_image_fails(tiny_image):

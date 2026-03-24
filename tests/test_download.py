@@ -44,6 +44,6 @@ def test_site_values_valid():
         registry = yaml.safe_load(f)
     valid_sites = {"conjunctiva", "nailbed"}
     for entry in registry["datasets"]:
-        assert (
-            entry["site"] in valid_sites
-        ), f"Entry {entry['id']} has invalid site: {entry['site']}"
+        assert entry["site"] in valid_sites, (
+            f"Entry {entry['id']} has invalid site: {entry['site']}"
+        )
