@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: anemiascan-inference-backup
+    env: docker
+    dockerfilePath: ./inference/Dockerfile
+    autoDeploy: false
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: HF_CONJ_MODEL_REPO
+        value: hssling/anemia-efficientnet-b4-conjunctiva
+      - key: ENSEMBLE_W_CONJ
+        value: "1.0"
+      - key: ENSEMBLE_W_NAIL
+        value: "0.0"

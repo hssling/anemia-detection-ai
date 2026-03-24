@@ -8,7 +8,7 @@ on:
       - "inference/**"
       - "training/models/**"
       - "render.yaml"
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   deploy-render:
