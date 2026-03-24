@@ -220,7 +220,13 @@ demo = gr.Interface(
     title="AnemiaScan -- AI Anemia Screening",
     description=(
         "Upload a palpebral conjunctiva and/or nail-bed image to estimate hemoglobin "
-        "and classify anemia severity. **Research tool only -- not a medical device.**"
+        "and classify anemia severity. The primary live deployment uses a fine-tuned "
+        "EfficientNet-B4 dual-head model with MC-dropout uncertainty and Grad-CAM support. "
+        "Tracked evaluation includes MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, "
+        "and Bland-Altman analysis. **Research tool only -- not a medical device.**\n\n"
+        "Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, "
+        "Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research "
+        "Hospital, Tumkur, hssling@yahoo.com, 8941087719. ORCID: 0000-0002-4771-8285."
     ),
     examples=[],
     theme=gr.themes.Soft(

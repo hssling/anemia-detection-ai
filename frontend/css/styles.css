@@ -606,6 +606,49 @@ body {
   font: 0.84rem/1.55 var(--font-mono);
 }
 
+.tech-summary {
+  max-width: 1180px;
+  margin: 0 auto 24px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.tech-summary-card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: var(--backdrop);
+  box-shadow: var(--shadow), var(--glass-shadow);
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tech-item {
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+}
+
+.tech-item h4 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 0.96rem;
+}
+
+.tech-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
 .app-footer { padding: 0 16px 36px; }
 
 .app-footer > div {
@@ -627,10 +670,26 @@ body {
   text-decoration: none;
 }
 
+.footer-credit {
+  max-width: 680px;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.footer-credit p {
+  margin: 0;
+}
+
+.footer-credit p + p {
+  margin-top: 4px;
+}
+
 @media (max-width: 1024px) {
   .hero-card,
   .result-layout,
-  .advanced-controls { grid-template-columns: 1fr; }
+  .advanced-controls,
+  .tech-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 720px) {

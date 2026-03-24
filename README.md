@@ -11,6 +11,15 @@ Non-invasive hemoglobin estimation and anemia classification from smartphone-cap
 
 AnemiaScan uses fine-tuned EfficientNet-B4 (+ ensemble) to estimate hemoglobin concentration (g/dL) and classify anemia severity (normal / mild / moderate / severe) from images captured by ASHAs using standard smartphones.
 
+## Technical Summary
+
+- Primary model: EfficientNet-B4 dual-head network for Hb regression and four-class anemia severity classification
+- Fine-tuning design: ImageNet-pretrained backbone, task heads warmed first, then selective backbone unfreezing
+- Inference features: MC-dropout uncertainty intervals and Grad-CAM explanations
+- Dataset strategy: public conjunctiva and nail-bed datasets unified with planned ICMR field data from Tumakuru
+- Tracked metrics: MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, Bland-Altman analysis
+- Project design targets: MAE <= 1.0 g/dL, Pearson r >= 0.85, AUC >= 0.85, sensitivity/specificity >= 80%
+
 ## Repository Structure
 
 - `data/scripts/` - Dataset download, unification, HF upload
@@ -37,6 +46,12 @@ pytest tests/
 ## Citation
 
 Siddalingaiah HS et al. (2026). AnemiaScan: Non-invasive AI-powered anemia screening. In preparation.
+
+## Attribution
+
+Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur, hssling@yahoo.com, 8941087719.
+
+ORCID: 0000-0002-4771-8285
 
 ## License
 

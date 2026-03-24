@@ -240,6 +240,35 @@
     </section>
   </main>
 
+  <section class="tech-summary" aria-labelledby="tech-summary-title">
+    <div class="tech-summary-card">
+      <div class="panel-head">
+        <div>
+          <p class="panel-kicker">Technical Summary</p>
+          <h3 id="tech-summary-title" class="panel-title">Model, Data, Fine-Tuning, Metrics</h3>
+        </div>
+      </div>
+      <div class="tech-grid">
+        <article class="tech-item">
+          <h4>Model</h4>
+          <p>Primary live deployment uses a fine-tuned EfficientNet-B4 dual-head model for hemoglobin regression and four-class anemia severity classification.</p>
+        </article>
+        <article class="tech-item">
+          <h4>Fine-Tuning</h4>
+          <p>Training is designed as head warm-up followed by selective backbone unfreezing on 380x380 RGB inputs, with MC-dropout retained for uncertainty estimation.</p>
+        </article>
+        <article class="tech-item">
+          <h4>Datasets</h4>
+          <p>The project dataset pipeline is designed to unify public conjunctiva and nail-bed datasets with planned ICMR field data from Tumakuru.</p>
+        </article>
+        <article class="tech-item">
+          <h4>Metrics</h4>
+          <p>Tracked metrics include MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, and Bland-Altman analysis. Current design targets are MAE <= 1.0 g/dL and AUC >= 0.85.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <footer class="app-footer">
     <div>
       <p>AnemiaScan · Netlify frontend · HF Space + Render inference stack</p>
@@ -248,6 +277,10 @@
         <a href="https://huggingface.co/spaces/hssling/anemia-screening" target="_blank" rel="noreferrer">HF Space</a>
         <a href="https://anemia-detection-ai-1.onrender.com/health" target="_blank" rel="noreferrer">Render health</a>
       </p>
+      <div class="footer-credit">
+        <p>Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur, <a href="mailto:hssling@yahoo.com">hssling@yahoo.com</a>, 8941087719.</p>
+        <p>ORCID: <a href="https://orcid.org/0000-0002-4771-8285" target="_blank" rel="noreferrer">0000-0002-4771-8285</a></p>
+      </div>
     </div>
   </footer>
 
