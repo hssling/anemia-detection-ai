@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnemiaScan</title>
+  <meta name="description" content="AnemiaScan frontend landing page and deployment links.">
+  <style>
+    :root {
+      --bg: #f5efe3;
+      --ink: #1f1a17;
+      --muted: #6a6158;
+      --accent: #b6402c;
+      --accent-dark: #8f2f1f;
+      --card: rgba(255, 252, 246, 0.92);
+      --line: rgba(31, 26, 23, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(182, 64, 44, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(143, 47, 31, 0.16), transparent 24%),
+        linear-gradient(180deg, #f9f3e9 0%, var(--bg) 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    main {
+      width: min(820px, 100%);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 24px 80px rgba(70, 45, 30, 0.12);
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 4.4rem);
+      line-height: 0.95;
+    }
+    p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      max-width: 62ch;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    a.button {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.16s ease, background 0.16s ease;
+    }
+    a.button.primary {
+      background: var(--accent);
+      color: #fff8f4;
+    }
+    a.button.secondary {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.74);
+    }
+    a.button:hover {
+      transform: translateY(-1px);
+    }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">AnemiaScan</p>
+    <h1>Frontend placeholder is live.</h1>
+    <p>
+      Netlify is now serving a real page. The full web app from Plan 5 has not been implemented in this
+      repository yet, so this site is currently a deployment landing page rather than the final screening UI.
+    </p>
+    <div class="actions">
+      <a class="button primary" href="https://huggingface.co/spaces/hssling/anemia-screening" target="_blank" rel="noreferrer">Open HF Space</a>
+      <a class="button secondary" href="https://anemia-detection-ai-1.onrender.com/health" target="_blank" rel="noreferrer">Check Render Health</a>
+    </div>
+    <div class="grid">
+      <section class="card">
+        <h2>Primary inference</h2>
+        <p>Hugging Face Space: <code>hssling/anemia-screening</code></p>
+      </section>
+      <section class="card">
+        <h2>Backup inference</h2>
+        <p>Render service: <code>https://anemia-detection-ai-1.onrender.com</code></p>
+      </section>
+      <section class="card">
+        <h2>Frontend status</h2>
+        <p>The Netlify deploy was publishing an empty <code>frontend/</code> directory. This page fixes that.</p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
