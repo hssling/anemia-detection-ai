@@ -1,0 +1,49 @@
+# training/config.yaml
+# All hyperparameters and paths. Override via CLI args in train.py.
+
+data:
+  hf_dataset_repo: "hssling/anemia-conjunctiva-nailbed"
+  image_size: 380          # EfficientNet-B4 canonical input
+  batch_size: 32
+  num_workers: 4
+
+model:
+  architectures:
+    - name: efficientnet_b4
+      pretrained: true
+      unfreeze_last_n_blocks: 3
+    - name: efficientnetv2_s
+      pretrained: true
+      unfreeze_last_n_blocks: 3
+    - name: convnext_tiny
+      pretrained: true
+      unfreeze_last_n_blocks: 3
+  dropout_rate: 0.3
+  mc_dropout_samples: 30   # for uncertainty (CI95) estimation
+
+training:
+  phase1_epochs: 10
+  phase2_epochs: 30
+  phase1_lr: 1.0e-3
+  phase2_lr: 1.0e-5
+  weight_decay: 1.0e-4
+  early_stopping_patience: 5
+  loss_regression_weight: 0.7
+  loss_classification_weight: 0.3
+  random_seed: 42
+  n_folds: 5
+
+classes:
+  - normal
+  - mild
+  - moderate
+  - severe
+
+output:
+  model_dir: "outputs/models"
+  metrics_dir: "outputs/metrics"
+  figures_dir: "outputs/figures"
+
+wandb:
+  project: "anemiascan"
+  entity: null    # set to your W&B username if needed
