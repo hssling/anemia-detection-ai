@@ -11,6 +11,7 @@ Routes:
 import io
 import logging
 import os
+from threading import Thread
 
 import gradio as gr
 import uvicorn
@@ -89,6 +90,8 @@ footer { display: none !important; }
 _MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
 _MAX_IMAGE_PIXELS = 4096 * 4096  # ~16 MP
 
+_PRELOAD_STATUS = "not_started"
+
 
 def _open_image(raw: bytes) -> Image.Image:
     """Open image bytes with size guards to prevent OOM from malicious uploads."""
@@ -102,16 +105,32 @@ def _open_image(raw: bytes) -> Image.Image:
 
 @app.on_event("startup")
 async def startup():
-    log.info("Preloading models ...")
-    preload_all_models()
-    log.info("Models ready.")
+    global _PRELOAD_STATUS
+
+    def _warm_models() -> None:
+        global _PRELOAD_STATUS
+        _PRELOAD_STATUS = "running"
+        log.info("Background model warmup started")
+        try:
+            preload_all_models()
+            _PRELOAD_STATUS = "completed"
+            log.info("Background model warmup completed")
+        except Exception:
+            _PRELOAD_STATUS = "failed"
+            log.exception("Background model warmup failed")
+
+    Thread(target=_warm_models, daemon=True).start()
 
 
 @app.get("/health")
 def health():
     from inference.model_loader import _MODEL_CACHE
 
-    return {"status": "ok", "models_loaded": list(_MODEL_CACHE.keys())}
+    return {
+        "status": "ok",
+        "models_loaded": list(_MODEL_CACHE.keys()),
+        "model_preload": _PRELOAD_STATUS,
+    }
 
 
 @app.get("/")
