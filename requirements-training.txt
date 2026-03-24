@@ -1,0 +1,14 @@
+torch>=2.2.0
+torchvision>=0.17.0
+timm>=0.9.16
+albumentations>=1.4.0
+safetensors>=0.4.3
+wandb>=0.17.0
+huggingface_hub>=0.22.0
+datasets>=2.18.0
+scikit-learn>=1.4.0
+scipy>=1.12.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+nbformat>=5.9.0
+pyyaml>=6.0.1
