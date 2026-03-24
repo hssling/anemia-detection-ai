@@ -34,6 +34,8 @@ jobs:
           cp inference/Dockerfile .hf-space/Dockerfile
           cp -R inference .hf-space/inference
           cp -R training .hf-space/training
+          printf '%s\n' "${GITHUB_SHA:-manual}" > .hf-space/.deploy-sha
+          printf '%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" > .hf-space/.deploy-timestamp
           cat <<'EOF' > .hf-space/README.md
           ---
           title: AnemiaScan
