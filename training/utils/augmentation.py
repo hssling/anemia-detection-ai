@@ -10,8 +10,8 @@ def get_augmentation_pipeline(image_size: int = 380) -> A.Compose:
         A.Rotate(limit=15, p=0.7),
         A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.6),
         A.HueSaturationValue(hue_shift_limit=10, sat_shift_limit=15, val_shift_limit=10, p=0.4),
-        A.GaussNoise(var_limit=(10, 50), p=0.2),
-        A.CoarseDropout(max_holes=4, max_height=32, max_width=32, p=0.3),
+        A.GaussNoise(std_range=(0.01, 0.05), p=0.2),
+        A.CoarseDropout(num_holes_range=(1, 4), hole_height_range=(1, 32), hole_width_range=(1, 32), p=0.3),
     ])
 
 
