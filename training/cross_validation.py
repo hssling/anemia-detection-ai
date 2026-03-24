@@ -16,11 +16,12 @@ import argparse
 import json
 import logging
 import pathlib
+from collections import Counter
 
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
-from training.train import load_config, train_model
+from training.train import load_config, prepare_supervised_rows, train_model
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -35,7 +36,23 @@ def run_cross_validation(
     """
     Run 5-fold stratified CV. Returns dict with mean +/- std of each metric.
     """
-    n_folds = config["training"]["n_folds"]
+    rows = prepare_supervised_rows(rows, context=f"{model_name} cross-validation input")
+    requested_folds = config["training"]["n_folds"]
+    class_counts = Counter(r["anemia_class"] for r in rows)
+    max_supported_folds = min(class_counts.values())
+    if max_supported_folds < 2:
+        raise ValueError(
+            f"{model_name} cross-validation requires at least 2 samples in each class, got {dict(class_counts)}."
+        )
+    n_folds = min(requested_folds, max_supported_folds)
+    if n_folds < requested_folds:
+        log.warning(
+            "Reducing CV folds for %s from %s to %s due to limited class counts: %s",
+            model_name,
+            requested_folds,
+            n_folds,
+            dict(class_counts),
+        )
     fold_metrics = []
 
     strat_labels = [r["anemia_class"] for r in rows]

@@ -1,10 +1,27 @@
 # training/utils/augmentation.py
 """Albumentations pipelines for training and validation."""
 
-import albumentations as A
+try:
+    import albumentations as A
+except ModuleNotFoundError:  # pragma: no cover
+    A = None
 
 
-def get_augmentation_pipeline(image_size: int = 380) -> A.Compose:
+class _IdentityCompose:
+    def __init__(self, image_size: int):
+        self.image_size = image_size
+
+    def __call__(self, *, image):
+        import numpy as np
+        from PIL import Image
+
+        pil = Image.fromarray(image).resize((self.image_size, self.image_size))
+        return {"image": np.array(pil)}
+
+
+def get_augmentation_pipeline(image_size: int = 380):
+    if A is None:
+        return _IdentityCompose(image_size)
     return A.Compose(
         [
             A.Resize(image_size, image_size),
@@ -18,7 +35,9 @@ def get_augmentation_pipeline(image_size: int = 380) -> A.Compose:
     )
 
 
-def get_val_transforms(image_size: int = 380) -> A.Compose:
+def get_val_transforms(image_size: int = 380):
+    if A is None:
+        return _IdentityCompose(image_size)
     return A.Compose(
         [
             A.Resize(image_size, image_size),

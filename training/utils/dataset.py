@@ -2,6 +2,7 @@
 """PyTorch Dataset for anemia screening images."""
 
 from typing import Any
+import math
 
 import numpy as np
 import torch
@@ -50,6 +51,15 @@ class AnemiaDataset(Dataset):
         std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
         img_tensor = (img_tensor - mean) / std
 
-        hb_val = float(row["hb_value"]) if row["hb_value"] is not None else 0.0
-        cls_idx = CLASS_TO_IDX.get(row.get("anemia_class", "normal"), 0)
+        raw_hb = row.get("hb_value")
+        if raw_hb is None or (isinstance(raw_hb, float) and math.isnan(raw_hb)):
+            raise ValueError(f"Row {row.get('image_id', idx)} is missing hb_value.")
+        hb_val = float(raw_hb)
+
+        anemia_class = row.get("anemia_class")
+        if anemia_class not in CLASS_TO_IDX:
+            raise ValueError(
+                f"Row {row.get('image_id', idx)} has unsupported anemia_class={anemia_class!r}."
+            )
+        cls_idx = CLASS_TO_IDX[anemia_class]
         return img_tensor, hb_val, cls_idx

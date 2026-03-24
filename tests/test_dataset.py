@@ -56,3 +56,25 @@ def test_augmentation_does_not_change_shape(tmp_path):
     ds_aug = AnemiaDataset(rows, image_size=380, augment=True)
     img_t, _, _ = ds_aug[0]
     assert img_t.shape == (3, 380, 380)
+
+
+def test_dataset_rejects_missing_hb_value(tmp_path):
+    """Rows without continuous Hb labels must not be silently coerced to zero."""
+    import pytest
+    from training.utils.dataset import AnemiaDataset
+
+    rows = [_make_fake_hf_row(tmp_path, hb=None, anemia_class="mild")]
+    ds = AnemiaDataset(rows, image_size=380, augment=False)
+    with pytest.raises(ValueError, match="missing hb_value"):
+        ds[0]
+
+
+def test_dataset_rejects_unknown_anemia_class(tmp_path):
+    """Rows with unsupported class labels must fail loudly."""
+    import pytest
+    from training.utils.dataset import AnemiaDataset
+
+    rows = [_make_fake_hf_row(tmp_path, hb=10.5, anemia_class="anemia")]
+    ds = AnemiaDataset(rows, image_size=380, augment=False)
+    with pytest.raises(ValueError, match="unsupported anemia_class"):
+        ds[0]

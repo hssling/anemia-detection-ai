@@ -15,11 +15,12 @@ import importlib
 import json
 import logging
 import pathlib
+import math
+from collections import Counter
 
 import numpy as np
 import torch
 import torch.nn as nn
-import wandb
 import yaml
 from torch.utils.data import DataLoader
 
@@ -31,6 +32,49 @@ from training.utils.dataset import AnemiaDataset
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
+
+try:
+    import wandb
+except ModuleNotFoundError:  # pragma: no cover
+    wandb = None
+
+
+class _NullWandbRun:
+    def log(self, *_args, **_kwargs):
+        return None
+
+    def finish(self):
+        return None
+
+
+def _is_valid_supervised_row(row: dict) -> bool:
+    hb_value = row.get("hb_value")
+    anemia_class = row.get("anemia_class")
+    if hb_value is None:
+        return False
+    try:
+        hb_float = float(hb_value)
+    except (TypeError, ValueError):
+        return False
+    if math.isnan(hb_float):
+        return False
+    return anemia_class in {"normal", "mild", "moderate", "severe"}
+
+
+def prepare_supervised_rows(rows: list[dict], context: str = "training") -> list[dict]:
+    valid_rows = [row for row in rows if _is_valid_supervised_row(row)]
+    dropped = len(rows) - len(valid_rows)
+    if dropped:
+        log.warning("%s: dropped %s rows without usable Hb/class labels", context, dropped)
+    if len(valid_rows) < 2:
+        raise ValueError(f"{context}: not enough supervised rows after filtering ({len(valid_rows)}).")
+
+    class_counts = Counter(row["anemia_class"] for row in valid_rows)
+    if len(class_counts) < 2:
+        raise ValueError(
+            f"{context}: need at least 2 anemia classes for meaningful validation, got {dict(class_counts)}."
+        )
+    return valid_rows
 
 
 def load_config(path: pathlib.Path) -> dict:
@@ -54,7 +98,7 @@ def multitask_loss(
     w_reg: float = 0.7,
     w_cls: float = 0.3,
 ) -> torch.Tensor:
-    mse = nn.functional.mse_loss(hb_pred.squeeze(), hb_true.float())
+    mse = nn.functional.mse_loss(hb_pred.view(-1), hb_true.float().view(-1))
     ce = nn.functional.cross_entropy(class_logits, class_true.long())
     return w_reg * mse + w_cls * ce
 
@@ -102,6 +146,9 @@ def train_model(
     run_name: str = "",
 ) -> dict:
     """Full two-phase training. Returns best val metrics dict."""
+    train_rows = prepare_supervised_rows(train_rows, context=f"{run_name or model_name} train split")
+    val_rows = prepare_supervised_rows(val_rows, context=f"{run_name or model_name} val split")
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     log.info(f"Training {model_name} fold={fold} on {device}")
 
@@ -125,12 +172,16 @@ def train_model(
 
     model = get_model(model_name, config).to(device)
 
-    wandb_run = wandb.init(
-        project=config["wandb"]["project"],
-        name=run_name or f"{model_name}_fold{fold}",
-        config=config,
-        reinit=True,
-    )
+    if wandb is None:
+        log.warning("wandb is not installed; remote experiment logging is disabled.")
+        wandb_run = _NullWandbRun()
+    else:
+        wandb_run = wandb.init(
+            project=config["wandb"]["project"],
+            name=run_name or f"{model_name}_fold{fold}",
+            config=config,
+            reinit=True,
+        )
 
     # Phase 1: freeze backbone, train heads
     model.freeze_backbone()
@@ -143,7 +194,7 @@ def train_model(
     for epoch in range(config["training"]["phase1_epochs"]):
         train_m = run_epoch(model, train_loader, optimizer, device, training=True, config=config)
         val_m = run_epoch(model, val_loader, optimizer, device, training=False, config=config)
-        wandb.log(
+        wandb_run.log(
             {
                 "epoch": epoch,
                 **{f"train/{k}": v for k, v in train_m.items()},
@@ -179,7 +230,7 @@ def train_model(
         train_m = run_epoch(model, train_loader, optimizer, device, training=True, config=config)
         val_m = run_epoch(model, val_loader, optimizer, device, training=False, config=config)
         scheduler.step()
-        wandb.log(
+        wandb_run.log(
             {
                 "epoch": epoch + config["training"]["phase1_epochs"],
                 **{f"train/{k}": v for k, v in train_m.items()},

@@ -10,7 +10,10 @@ def compute_regression_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     """MAE, RMSE, Pearson r for Hb regression."""
     mae = float(np.mean(np.abs(y_true - y_pred)))
     rmse = float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
-    r, p_val = stats.pearsonr(y_true, y_pred)
+    if len(y_true) < 2 or np.allclose(y_true, y_true[0]) or np.allclose(y_pred, y_pred[0]):
+        r, p_val = float("nan"), float("nan")
+    else:
+        r, p_val = stats.pearsonr(y_true, y_pred)
     return {"mae": mae, "rmse": rmse, "pearson_r": float(r), "pearson_p": float(p_val)}
 
 

@@ -43,3 +43,13 @@ def test_bland_altman_returns_dict():
     assert "mean_diff" in stats
     assert "loa_upper" in stats
     assert "loa_lower" in stats
+
+
+def test_regression_metrics_return_nan_pearson_for_constant_input():
+    from training.evaluation.metrics import compute_regression_metrics
+
+    y_true = np.array([10.0, 10.0, 10.0])
+    y_pred = np.array([10.1, 10.2, 10.3])
+    metrics = compute_regression_metrics(y_true, y_pred)
+    assert np.isnan(metrics["pearson_r"])
+    assert np.isnan(metrics["pearson_p"])

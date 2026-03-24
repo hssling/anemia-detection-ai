@@ -13,6 +13,7 @@ import argparse
 import logging
 import pathlib
 import shutil
+from collections import Counter
 
 import pandas as pd
 import yaml
@@ -195,18 +196,60 @@ def _assign_splits(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
     df["split"] = "train"
-    strat_col = df["anemia_class"] + "_" + df["source_dataset"]
+    temp_size = max(int(round(len(df) * 0.30)), 1)
+    strat_col = _best_stratify_labels(df, test_size=temp_size)
 
     train_idx, temp_idx = train_test_split(
-        df.index, test_size=0.30, stratify=strat_col, random_state=42
+        df.index,
+        test_size=0.30,
+        stratify=strat_col if strat_col is not None else None,
+        random_state=42,
     )
-    strat_temp = strat_col.loc[temp_idx]
+    strat_temp = strat_col.loc[temp_idx] if strat_col is not None else None
+    temp_test_size = max(int(round(len(temp_idx) * 0.50)), 1)
     val_idx, test_idx = train_test_split(
-        temp_idx, test_size=0.50, stratify=strat_temp, random_state=42
+        temp_idx,
+        test_size=0.50,
+        stratify=strat_temp if _supports_stratify(strat_temp, test_size=temp_test_size) else None,
+        random_state=42,
     )
     df.loc[val_idx, "split"] = "val"
     df.loc[test_idx, "split"] = "test"
     return df
+
+
+def _supports_stratify(labels: pd.Series | None, test_size: int | None = None) -> bool:
+    if labels is None or len(labels) < 2:
+        return False
+    counts = Counter(labels.tolist())
+    if len(counts) < 2 or min(counts.values()) < 2:
+        return False
+    if test_size is not None and test_size < len(counts):
+        return False
+    return True
+
+
+def _best_stratify_labels(df: pd.DataFrame, test_size: int) -> pd.Series | None:
+    combo = df["anemia_class"].astype(str) + "_" + df["source_dataset"].astype(str)
+    if _supports_stratify(combo, test_size=test_size):
+        return combo
+
+    anemia_only = df["anemia_class"].astype(str)
+    if _supports_stratify(anemia_only, test_size=test_size):
+        log.warning(
+            "Falling back to anemia_class-only stratification because class+dataset strata are too small."
+        )
+        return anemia_only
+
+    source_only = df["source_dataset"].astype(str)
+    if _supports_stratify(source_only, test_size=test_size):
+        log.warning(
+            "Falling back to source_dataset-only stratification because anemia strata are too small."
+        )
+        return source_only
+
+    log.warning("Falling back to random split because no robust stratification labels are available.")
+    return None
 
 
 def main():

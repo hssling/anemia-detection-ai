@@ -86,3 +86,25 @@ def test_image_renamed_to_standard_format(tmp_path):
     assert len(images) == 3, f"Expected 3 images, found {len(images)}"
     for img in images:
         assert img.name.startswith("fake_dataset_conjunctiva_")
+
+
+def test_assign_splits_falls_back_from_tiny_combo_strata():
+    """Split assignment should still work when class+dataset strata are too small."""
+    from data.scripts.unify_datasets import _assign_splits
+
+    df = pd.DataFrame(
+        {
+            "image_id": [f"id_{i}" for i in range(8)],
+            "image_path": [f"/tmp/img_{i}.jpg" for i in range(8)],
+            "site": ["conjunctiva"] * 8,
+            "hb_value": [12.0, 12.2, 11.0, 11.1, 9.5, 9.6, 7.5, 7.6],
+            "anemia_class": ["normal", "normal", "mild", "mild", "moderate", "moderate", "severe", "severe"],
+            "age_group": ["adult"] * 8,
+            "source_dataset": ["ds1", "ds2", "ds1", "ds2", "ds1", "ds2", "ds1", "ds2"],
+            "image_quality_score": [None] * 8,
+            "split": [None] * 8,
+        }
+    )
+
+    out = _assign_splits(df)
+    assert set(out["split"]) == {"train", "val", "test"}
