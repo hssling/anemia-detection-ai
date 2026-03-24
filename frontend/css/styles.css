@@ -1,7 +1,7 @@
 :root {
-  --font-body: "Aptos", "Segoe UI Variable Text", "Segoe UI", "Trebuchet MS", sans-serif;
-  --font-display: "Bahnschrift", "Arial Narrow", "Aptos Display", sans-serif;
-  --font-mono: "Cascadia Code", "Consolas", monospace;
+  --font-body: "Verdana", "Tahoma", "Trebuchet MS", sans-serif;
+  --font-display: "Franklin Gothic Medium", "Arial Narrow", "Segoe UI", sans-serif;
+  --font-mono: "Lucida Console", "Consolas", monospace;
   --paper: #f5efe6;
   --paper-2: #efe4d5;
   --surface: rgba(255, 251, 244, 0.72);
@@ -185,30 +185,34 @@ body {
   border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
 }
 
-.theme-toggle {
+.theme-switch {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 10px 16px;
+  padding: 4px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
   background: linear-gradient(135deg, color-mix(in srgb, var(--surface-strong) 78%, transparent), color-mix(in srgb, var(--accent-soft) 80%, transparent));
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
   box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
-.theme-toggle-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
+.theme-choice {
+  min-width: 74px;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.theme-choice.active {
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  color: #fff7f2;
 }
 
 .button-small { padding: 10px 14px; font-size: 0.85rem; }
@@ -641,8 +645,9 @@ body {
   .probability-row { grid-template-columns: 74px 1fr 52px; font-size: 0.86rem; }
   .header-actions { width: 100%; justify-content: stretch; }
   .header-actions .button,
-  .header-actions .theme-toggle { flex: 1 1 auto; justify-content: center; }
+  .header-actions .theme-switch { flex: 1 1 auto; justify-content: center; }
   .button-wide { width: 100%; min-width: 0; }
   .action-row { align-items: stretch; }
-  .theme-toggle { width: 100%; }
+  .theme-switch { width: 100%; justify-content: stretch; }
+  .theme-choice { flex: 1 1 50%; }
 }

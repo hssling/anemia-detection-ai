@@ -12,13 +12,14 @@ function applyTheme(theme) {
     "content",
     theme === "dark" ? "#141d29" : "#9c2f1f",
   );
-  const themeToggle = document.getElementById("theme-toggle");
-  const themeToggleLabel = document.getElementById("theme-toggle-label");
-  if (themeToggle) {
-    themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
-  }
-  if (themeToggleLabel) {
-    themeToggleLabel.textContent = theme === "dark" ? "Dark Mode" : "Light Mode";
+  const darkButton = document.getElementById("theme-dark");
+  const lightButton = document.getElementById("theme-light");
+  if (darkButton && lightButton) {
+    const darkActive = theme === "dark";
+    darkButton.classList.toggle("active", darkActive);
+    lightButton.classList.toggle("active", !darkActive);
+    darkButton.setAttribute("aria-pressed", darkActive ? "true" : "false");
+    lightButton.setAttribute("aria-pressed", darkActive ? "false" : "true");
   }
   localStorage.setItem(THEME_KEY, theme);
 }
@@ -46,13 +47,9 @@ function setMode(mode) {
 
 function initThemeToggle() {
   const saved = localStorage.getItem(THEME_KEY);
-  const preferredDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-  applyTheme(saved || (preferredDark ? "dark" : "light"));
-
-  document.getElementById("theme-toggle")?.addEventListener("click", () => {
-    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    applyTheme(next);
-  });
+  applyTheme(saved || "dark");
+  document.getElementById("theme-dark")?.addEventListener("click", () => applyTheme("dark"));
+  document.getElementById("theme-light")?.addEventListener("click", () => applyTheme("light"));
 }
 
 function initModeToggle() {
