@@ -1,40 +1,47 @@
 # training/config.yaml
-# AnemiaScan EfficientNet-B4 training configuration
-
-model:
-  architecture: efficientnet_b4
-  pretrained: true
-  num_classes: 1          # regression: Hb g/dL
-  dropout: 0.3
-
 data:
-  conjunctiva_repo: hssling/anemia-conjunctiva-dataset
-  nailbed_repo: hssling/anemia-nailbed-dataset
+  hf_dataset_repo: "hssling/anemia-conjunctiva-nailbed"
   image_size: 380
   batch_size: 32
   num_workers: 4
-  val_split: 0.2
-  augmentation:
-    horizontal_flip: true
-    random_rotation: 15
-    color_jitter: true
+
+model:
+  architectures:
+    - name: efficientnet_b4
+      pretrained: true
+      unfreeze_last_n_blocks: 3
+    - name: efficientnetv2_s
+      pretrained: true
+      unfreeze_last_n_blocks: 3
+    - name: convnext_tiny
+      pretrained: true
+      unfreeze_last_n_blocks: 3
+  dropout_rate: 0.3
+  mc_dropout_samples: 30
 
 training:
-  epochs: 50
-  optimizer: adamw
-  learning_rate: 3.0e-4
+  phase1_epochs: 10
+  phase2_epochs: 30
+  phase1_lr: 1.0e-3
+  phase2_lr: 1.0e-5
   weight_decay: 1.0e-4
-  scheduler: cosine_annealing
-  early_stopping_patience: 10
-  mixed_precision: true
-  gradient_clip: 1.0
-
-cross_validation:
+  early_stopping_patience: 5
+  loss_regression_weight: 0.7
+  loss_classification_weight: 0.3
+  random_seed: 42
   n_folds: 5
-  stratify_by: anemia_severity
+
+classes:
+  - normal
+  - mild
+  - moderate
+  - severe
 
 output:
-  conjunctiva_repo: hssling/anemia-efficientnet-b4-conjunctiva
-  nailbed_repo: hssling/anemia-efficientnet-b4-nailbed
-  ensemble_repo: hssling/anemia-ensemble
-  push_to_hub: true
+  model_dir: "outputs/models"
+  metrics_dir: "outputs/metrics"
+  figures_dir: "outputs/figures"
+
+wandb:
+  project: "anemiascan"
+  entity: null
