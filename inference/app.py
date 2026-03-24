@@ -42,6 +42,8 @@ app.add_middleware(
 
 W_CONJ = float(os.getenv("ENSEMBLE_W_CONJ", "0.5"))
 W_NAIL = float(os.getenv("ENSEMBLE_W_NAIL", "0.5"))
+ENABLE_GRADIO = os.getenv("ENABLE_GRADIO", "1").lower() not in {"0", "false", "no"}
+PRELOAD_MODELS = os.getenv("PRELOAD_MODELS", "1").lower() not in {"0", "false", "no"}
 
 SPACE_CSS = """
 :root {
@@ -107,6 +109,11 @@ def _open_image(raw: bytes) -> Image.Image:
 async def startup():
     global _PRELOAD_STATUS
 
+    if not PRELOAD_MODELS:
+        _PRELOAD_STATUS = "disabled"
+        log.info("Background model warmup disabled by PRELOAD_MODELS=0")
+        return
+
     def _warm_models() -> None:
         global _PRELOAD_STATUS
         _PRELOAD_STATUS = "running"
@@ -135,21 +142,22 @@ def health():
 
 @app.api_route("/", methods=["GET", "HEAD"])
 def root():
+    demo_target = "/demo/" if ENABLE_GRADIO else "/health"
     html = """
     <!doctype html>
     <html lang="en">
       <head>
         <meta charset="utf-8">
-        <meta http-equiv="refresh" content="0; url=/demo/">
+        <meta http-equiv="refresh" content="0; url={target}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>AnemiaScan</title>
       </head>
       <body>
-        <p>Redirecting to <a href="/demo/">/demo/</a> ...</p>
+        <p>Redirecting to <a href="{target}">{target}</a> ...</p>
       </body>
     </html>
     """
-    return HTMLResponse(content=html, status_code=200)
+    return HTMLResponse(content=html.format(target=demo_target), status_code=200)
 
 
 @app.post("/api/predict")
@@ -240,39 +248,40 @@ def gradio_predict(conj_img, nail_img):
     return summary, result["class_probabilities"]
 
 
-demo = gr.Interface(
-    fn=gradio_predict,
-    inputs=[
-        gr.Image(label="Conjunctiva Image (optional)", type="numpy"),
-        gr.Image(label="Nail-bed Image (optional)", type="numpy"),
-    ],
-    outputs=[
-        gr.Markdown(label="Result"),
-        gr.Label(label="Class Probabilities", num_top_classes=4),
-    ],
-    title="AnemiaScan -- AI Anemia Screening",
-    description=(
-        "Upload a palpebral conjunctiva and/or nail-bed image to estimate hemoglobin "
-        "and classify anemia severity. The primary live deployment uses a fine-tuned "
-        "EfficientNet-B4 dual-head model with MC-dropout uncertainty and Grad-CAM support. "
-        "Tracked evaluation includes MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, "
-        "and Bland-Altman analysis. Saved notebook output for the current conjunctiva-only run "
-        "reported CV MAE 0.00371 +/- 0.00108 and CV RMSE 0.00451 +/- 0.00126, but AUC and "
-        "Pearson r were not estimable (nan) in that run. **Research tool only -- not a medical device.**\n\n"
-        "Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, "
-        "Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research "
-        "Hospital, Tumkur, hssling@yahoo.com, 8941087719. ORCID: 0000-0002-4771-8285."
-    ),
-    examples=[],
-    theme=gr.themes.Soft(
-        primary_hue="rose",
-        secondary_hue="amber",
-        neutral_hue="stone",
-    ),
-    css=SPACE_CSS,
-)
+if ENABLE_GRADIO:
+    demo = gr.Interface(
+        fn=gradio_predict,
+        inputs=[
+            gr.Image(label="Conjunctiva Image (optional)", type="numpy"),
+            gr.Image(label="Nail-bed Image (optional)", type="numpy"),
+        ],
+        outputs=[
+            gr.Markdown(label="Result"),
+            gr.Label(label="Class Probabilities", num_top_classes=4),
+        ],
+        title="AnemiaScan -- AI Anemia Screening",
+        description=(
+            "Upload a palpebral conjunctiva and/or nail-bed image to estimate hemoglobin "
+            "and classify anemia severity. The primary live deployment uses a fine-tuned "
+            "EfficientNet-B4 dual-head model with MC-dropout uncertainty and Grad-CAM support. "
+            "Tracked evaluation includes MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, "
+            "and Bland-Altman analysis. Saved notebook output for the current conjunctiva-only run "
+            "reported CV MAE 0.00371 +/- 0.00108 and CV RMSE 0.00451 +/- 0.00126, but AUC and "
+            "Pearson r were not estimable (nan) in that run. **Research tool only -- not a medical device.**\n\n"
+            "Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, "
+            "Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research "
+            "Hospital, Tumkur, hssling@yahoo.com, 8941087719. ORCID: 0000-0002-4771-8285."
+        ),
+        examples=[],
+        theme=gr.themes.Soft(
+            primary_hue="rose",
+            secondary_hue="amber",
+            neutral_hue="stone",
+        ),
+        css=SPACE_CSS,
+    )
 
-app = gr.mount_gradio_app(app, demo, path="/demo")
+    app = gr.mount_gradio_app(app, demo, path="/demo")
 
 if __name__ == "__main__":
     uvicorn.run("inference.app:app", host="0.0.0.0", port=8000, reload=False)

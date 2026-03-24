@@ -14,5 +14,9 @@ services:
         value: "1.0"
       - key: ENSEMBLE_W_NAIL
         value: "0.0"
+      - key: PRELOAD_MODELS
+        value: "0"
+      - key: ENABLE_GRADIO
+        value: "0"
     healthCheckPath: /health
     plan: free
