@@ -197,8 +197,16 @@ demo = gr.Interface(
         gr.Image(label="Grad-CAM", type="pil"),
     ],
     title="AnemiaScan",
-    description="Upload conjunctiva and/or nail-bed images for research-only Hb estimation.",
-    allow_flagging="never",
+    description=(
+        "Upload conjunctiva and/or nail-bed images for research-only Hb estimation.\n\n"
+        "Model summary: EfficientNet-B4 dual-head model, ImageNet-pretrained and fine-tuned on 380x380 RGB images. "
+        "Inference includes MC-dropout uncertainty and Grad-CAM explanations. "
+        "Tracked evaluation metrics include MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, and Bland-Altman analysis. "
+        "Current live deployment loads conjunctiva weights first; nail-bed support follows once model weights are uploaded.\n\n"
+        "<sub>Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, "
+        "Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research "
+        "Hospital, Tumkur, hssling@yahoo.com, 8941087719. ORCID: 0000-0002-4771-8285.</sub>"
+    ),
 )
 
 app = gr.mount_gradio_app(base_app, demo, path="/demo")

@@ -111,6 +111,47 @@
     </section>
   </main>
 
+  <section class="tech-summary" aria-labelledby="tech-summary-title">
+    <div class="tech-summary-inner">
+      <h2 id="tech-summary-title">Technical Summary</h2>
+      <p>
+        Current deployment uses a fine-tuned EfficientNet-B4 dual-head model for hemoglobin regression and four-class
+        anemia severity classification. Inference supports MC-dropout confidence intervals and Grad-CAM explanations.
+      </p>
+      <div class="tech-grid">
+        <article class="tech-card">
+          <h3>Model</h3>
+          <p>Primary backbone: EfficientNet-B4, ImageNet-pretrained, fine-tuned on 380×380 RGB images.</p>
+          <p>Heads: Hb estimate in g/dL plus severity classes: normal, mild, moderate, severe.</p>
+        </article>
+        <article class="tech-card">
+          <h3>Fine-tuning</h3>
+          <p>Two-stage training design: head warm-up, then partial backbone unfreezing for domain adaptation.</p>
+          <p>Dropout is retained at inference time for uncertainty estimation.</p>
+        </article>
+        <article class="tech-card">
+          <h3>Datasets</h3>
+          <p>Unified dataset pipeline is designed to combine public conjunctiva and nail-bed datasets with planned ICMR field data from Tumakuru.</p>
+          <p>Current live API has conjunctiva weights loaded; nail-bed deployment remains pending weight upload.</p>
+        </article>
+        <article class="tech-card">
+          <h3>Metrics</h3>
+          <p>Tracked evaluation metrics include MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, and Bland-Altman analysis.</p>
+          <p>Design targets: MAE ≤ 1.0 g/dL, Pearson r ≥ 0.85, AUC ≥ 0.85, sensitivity/specificity ≥ 80%.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <footer class="app-footer">
+    <p class="footnote-credit">
+      Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur, <a href="mailto:hssling@yahoo.com">hssling@yahoo.com</a>, 8941087719.
+    </p>
+    <p class="footnote-credit">
+      ORCID: <a href="https://orcid.org/0000-0002-4771-8285" target="_blank" rel="noreferrer">0000-0002-4771-8285</a>
+    </p>
+  </footer>
+
   <script type="module">
     window._ENV = {
       HF_SPACE_URL: "{{ HF_SPACE_URL }}",

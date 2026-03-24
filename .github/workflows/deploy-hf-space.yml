@@ -49,6 +49,10 @@ jobs:
           # AnemiaScan
 
           Research-only non-invasive anemia screening demo.
+
+          Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research Hospital, Tumkur, hssling@yahoo.com, 8941087719.
+
+          ORCID: 0000-0002-4771-8285
           EOF
 
       - name: Upload to HF Space
