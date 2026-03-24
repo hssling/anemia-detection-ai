@@ -155,7 +155,11 @@ def train_model(
         )
 
     # Phase 2: unfreeze last 3 blocks
-    model.unfreeze_last_n_blocks(config["model"]["architectures"][0]["unfreeze_last_n_blocks"])
+    arch_cfg = next(
+        (a for a in config["model"]["architectures"] if a["name"] == model_name),
+        config["model"]["architectures"][0],
+    )
+    model.unfreeze_last_n_blocks(arch_cfg["unfreeze_last_n_blocks"])
     optimizer = torch.optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=config["training"]["phase2_lr"],

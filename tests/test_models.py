@@ -9,8 +9,8 @@ import torch
     "model_name,image_size",
     [
         ("efficientnet_b4", 380),
-        ("efficientnetv2_s", 384),
-        ("convnext_tiny", 224),
+        ("efficientnetv2_s", 380),
+        ("convnext_tiny", 380),
     ],
 )
 def test_model_forward_pass(model_name, image_size):
