@@ -17,7 +17,7 @@ import gradio as gr
 import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse
 from PIL import Image
 
 from inference.gradcam import generate_gradcam
@@ -133,9 +133,23 @@ def health():
     }
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
-    return RedirectResponse(url="/demo/")
+    html = """
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta http-equiv="refresh" content="0; url=/demo/">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>AnemiaScan</title>
+      </head>
+      <body>
+        <p>Redirecting to <a href="/demo/">/demo/</a> ...</p>
+      </body>
+    </html>
+    """
+    return HTMLResponse(content=html, status_code=200)
 
 
 @app.post("/api/predict")
@@ -242,7 +256,9 @@ demo = gr.Interface(
         "and classify anemia severity. The primary live deployment uses a fine-tuned "
         "EfficientNet-B4 dual-head model with MC-dropout uncertainty and Grad-CAM support. "
         "Tracked evaluation includes MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, "
-        "and Bland-Altman analysis. **Research tool only -- not a medical device.**\n\n"
+        "and Bland-Altman analysis. Saved notebook output for the current conjunctiva-only run "
+        "reported CV MAE 0.00371 +/- 0.00108 and CV RMSE 0.00451 +/- 0.00126, but AUC and "
+        "Pearson r were not estimable (nan) in that run. **Research tool only -- not a medical device.**\n\n"
         "Concept, design, build, training, deployment, testing by: Dr Siddalingaiah H S, "
         "Professor, Community Medicine, Shridevi Institute of Medical Sciences and Research "
         "Hospital, Tumkur, hssling@yahoo.com, 8941087719. ORCID: 0000-0002-4771-8285."
