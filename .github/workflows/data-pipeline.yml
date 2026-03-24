@@ -12,6 +12,10 @@ on:
         description: "Skip download step (1=skip, 0=run)"
         required: false
         default: "0"
+      skip_quality:
+        description: "Skip quality filter (1=skip for small/test datasets, 0=run)"
+        required: false
+        default: "0"
 
 jobs:
   run-pipeline:
@@ -41,4 +45,5 @@ jobs:
           HUGGING_FACE_HUB_TOKEN: ${{ secrets.HF_TOKEN }}
           DATASET_ID: ${{ github.event.inputs.dataset_id }}
           SKIP_DOWNLOAD: ${{ github.event.inputs.skip_download }}
+          SKIP_QUALITY: ${{ github.event.inputs.skip_quality }}
         run: bash data/data_pipeline.sh
