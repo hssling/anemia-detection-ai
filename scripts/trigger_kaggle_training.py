@@ -53,10 +53,12 @@ def push_and_trigger(
     meta_path.write_text(json.dumps(kernel_meta, indent=2))
     log.info(f"Written kernel metadata to {meta_path}")
 
-    log.info(f"Pushing notebook {notebook_path} to Kaggle kernel: {username}/{kernel_slug}")
-    api.kernels_push_cli(str(notebook_path.parent))
-    log.info("✓ Notebook pushed. Run triggered.")
-    meta_path.unlink()  # clean up temp file
+    try:
+        log.info(f"Pushing notebook {notebook_path} to Kaggle kernel: {username}/{kernel_slug}")
+        api.kernels_push_cli(str(notebook_path.parent))
+        log.info("✓ Notebook pushed. Run triggered.")
+    finally:
+        meta_path.unlink(missing_ok=True)  # always clean up — never commit metadata to repo
     return f"{username}/{kernel_slug}"
 
 

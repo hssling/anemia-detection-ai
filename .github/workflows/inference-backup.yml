@@ -13,10 +13,13 @@ on:
 jobs:
   deploy-render:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Trigger Render deploy hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+          curl -X POST "$RENDER_DEPLOY_HOOK_URL" \
             -H "Accept: application/json" \
             --fail-with-body
 
@@ -24,7 +27,7 @@ jobs:
         run: |
           sleep 60
           for i in $(seq 1 10); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
               "https://anemiascan-inference-backup.onrender.com/health")
             echo "Attempt $i: HTTP $STATUS"
             if [ "$STATUS" = "200" ]; then

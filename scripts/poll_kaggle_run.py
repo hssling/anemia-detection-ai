@@ -30,8 +30,22 @@ def poll(kernel_ref: str, timeout_minutes: int) -> bool:
     deadline = time.time() + timeout_minutes * 60
     log.info(f"Polling kernel: {kernel_ref} (timeout: {timeout_minutes} min)")
 
+    consecutive_errors = 0
+    MAX_CONSECUTIVE_ERRORS = 5
+
     while time.time() < deadline:
-        status_obj = api.kernels_status(kernel_ref)
+        try:
+            status_obj = api.kernels_status(kernel_ref)
+            consecutive_errors = 0
+        except Exception as exc:
+            consecutive_errors += 1
+            log.warning(f"  API error ({consecutive_errors}/{MAX_CONSECUTIVE_ERRORS}): {exc}")
+            if consecutive_errors >= MAX_CONSECUTIVE_ERRORS:
+                log.error("✗ Too many consecutive API errors — aborting poll.")
+                return False
+            time.sleep(POLL_INTERVAL_SECONDS)
+            continue
+
         status = status_obj.get("status", "unknown").lower()
         log.info(f"  Status: {status}")
 

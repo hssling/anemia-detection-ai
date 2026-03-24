@@ -17,11 +17,10 @@ import logging
 import pathlib
 
 import matplotlib
+matplotlib.use("Agg")  # must be before pyplot import — headless CI has no display
 import matplotlib.pyplot as plt
 import numpy as np
 from huggingface_hub import hf_hub_download
-
-matplotlib.use("Agg")  # non-interactive backend
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
