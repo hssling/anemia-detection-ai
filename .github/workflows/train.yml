@@ -1,0 +1,90 @@
+# .github/workflows/train.yml
+name: Train Models on Kaggle
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_note:
+        description: "Optional note for this training run"
+        required: false
+        default: "Manual trigger"
+
+jobs:
+  trigger-and-wait:
+    runs-on: ubuntu-latest
+    timeout-minutes: 420   # 7 hrs max (allows up to 6hr Kaggle run + buffer)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install kaggle huggingface_hub
+
+      - name: Configure Kaggle credentials
+        run: |
+          mkdir -p ~/.kaggle
+          echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' \
+            > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+
+      - name: Authenticate HuggingFace
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: huggingface-cli login --token "$HF_TOKEN"
+
+      - name: Push notebook and trigger Kaggle run
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+        run: |
+          python scripts/trigger_kaggle_training.py \
+            --notebook kaggle_notebook.ipynb \
+            --kernel-slug anemiascan-training \
+            --username "$KAGGLE_USERNAME"
+
+      - name: Poll until Kaggle run completes
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+        run: |
+          python scripts/poll_kaggle_run.py \
+            --kernel "$KAGGLE_USERNAME/anemiascan-training" \
+            --timeout-minutes 360
+
+      - name: Verify model weights were pushed to HF Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'EOF'
+          from huggingface_hub import HfApi
+          import os, sys
+          api = HfApi(token=os.environ["HF_TOKEN"])
+          repos = [
+              "hssling/anemia-efficientnet-b4-conjunctiva",
+              "hssling/anemia-efficientnet-b4-nailbed",
+              "hssling/anemia-ensemble",
+          ]
+          for repo in repos:
+              try:
+                  api.model_info(repo)
+                  print(f"✓ {repo}")
+              except Exception as e:
+                  print(f"✗ {repo}: {e}")
+                  sys.exit(1)
+          EOF
+
+      - name: Trigger HF Space deployment
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: model-updated
+
+      - name: Summary
+        run: |
+          echo "## Training Complete ✓" >> $GITHUB_STEP_SUMMARY
+          echo "Run note: ${{ github.event.inputs.run_note }}" >> $GITHUB_STEP_SUMMARY
+          echo "Models pushed to HuggingFace Hub." >> $GITHUB_STEP_SUMMARY
