@@ -3,6 +3,7 @@
 
 import json
 import logging
+import os
 import pathlib
 import shutil
 import tempfile
@@ -10,7 +11,7 @@ import tempfile
 from huggingface_hub import HfApi
 
 log = logging.getLogger(__name__)
-api = HfApi()
+api = HfApi(token=os.getenv("HF_TOKEN") or os.getenv("HUGGING_FACE_HUB_TOKEN"))
 
 
 def push_model(
