@@ -74,9 +74,9 @@ pipeline_tag: image-classification
 
 def push_all_models(
     conj_ckpt: str,
-    nail_ckpt: str,
+    nail_ckpt: str | None,
     cv_summary_conj: dict,
-    cv_summary_nail: dict,
+    cv_summary_nail: dict | None,
     w_conj: float,
     w_nail: float,
     config: dict,
@@ -89,21 +89,27 @@ def push_all_models(
         "conjunctiva",
         config,
     )
-    push_model(
-        nail_ckpt,
-        "hssling/anemia-efficientnet-b4-nailbed",
-        cv_summary_nail,
-        "efficientnet_b4",
-        "nailbed",
-        config,
-    )
+    if nail_ckpt and cv_summary_nail:
+        push_model(
+            nail_ckpt,
+            "hssling/anemia-efficientnet-b4-nailbed",
+            cv_summary_nail,
+            "efficientnet_b4",
+            "nailbed",
+            config,
+        )
+        nail_model_repo = "hssling/anemia-efficientnet-b4-nailbed"
+        nail_mae = cv_summary_nail.get("mae_mean", 0)
+    else:
+        log.warning("Skipping nail-bed model push because checkpoint or metrics are missing.")
+        nail_model_repo = None
+        nail_mae = 0
     ensemble_meta = {
         "conj_model": "hssling/anemia-efficientnet-b4-conjunctiva",
-        "nail_model": "hssling/anemia-efficientnet-b4-nailbed",
+        "nail_model": nail_model_repo,
         "w_conj": w_conj,
         "w_nail": w_nail,
-        "mae_mean": w_conj * cv_summary_conj.get("mae_mean", 0)
-        + w_nail * cv_summary_nail.get("mae_mean", 0),
+        "mae_mean": w_conj * cv_summary_conj.get("mae_mean", 0) + w_nail * nail_mae,
     }
     api.upload_file(
         path_or_fileobj=json.dumps(ensemble_meta, indent=2).encode(),
