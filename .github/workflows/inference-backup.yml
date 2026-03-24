@@ -1,0 +1,37 @@
+# .github/workflows/inference-backup.yml
+name: Deploy Backup Inference to Render
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "inference/**"
+      - "training/models/**"
+      - "render.yaml"
+    branches: [main]
+
+jobs:
+  deploy-render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy hook
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            -H "Accept: application/json" \
+            --fail-with-body
+
+      - name: Wait for Render service to be live
+        run: |
+          sleep 60
+          for i in $(seq 1 10); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              "https://anemiascan-inference-backup.onrender.com/health")
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "✓ Render service is live"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "✗ Render service did not become healthy in time"
+          exit 1
