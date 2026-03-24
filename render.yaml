@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: anemiascan-inference-backup
+    runtime: docker
+    dockerfilePath: inference/Dockerfile
+    envVars:
+      - key: HF_MODEL_REPO
+        value: hssling/anemia-ensemble
+      - key: HF_TOKEN
+        sync: false
+    healthCheckPath: /health
+    plan: free

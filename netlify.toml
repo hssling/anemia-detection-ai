@@ -1,0 +1,20 @@
+[build]
+  publish = "frontend"
+  command = "echo 'Static site - no build step'"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://*.hf.space https://*.onrender.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://hssling-anemia-screening.hf.space/:splat"
+  status = 200
+  force = false
