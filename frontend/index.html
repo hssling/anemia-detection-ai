@@ -30,6 +30,7 @@
       </div>
       <div class="header-actions">
         <button id="lang-toggle" class="button button-ghost button-small" type="button">ಕನ್ನಡ</button>
+        <button id="theme-toggle" class="button button-ghost button-small" type="button" aria-label="Switch color theme">Dark</button>
         <button id="mode-toggle" class="button button-ghost" type="button">Advanced Mode</button>
       </div>
     </div>
@@ -74,7 +75,7 @@
             </div>
             <input id="conj-input" type="file" accept="image/*" capture="environment" hidden>
             <button class="button button-soft capture-trigger" type="button" data-target="conj-input" data-i18n="capture_button">Capture / Upload</button>
-            <img id="conj-preview" class="image-preview" alt="Conjunctiva preview" hidden>
+            <img id="conj-preview" class="image-preview" alt="Conjunctiva preview" loading="lazy" decoding="async" hidden>
             <button id="conj-clear" class="text-link" type="button" hidden>Clear image</button>
           </article>
 
@@ -86,7 +87,7 @@
             </div>
             <input id="nail-input" type="file" accept="image/*" capture="environment" hidden>
             <button class="button button-soft capture-trigger" type="button" data-target="nail-input" data-i18n="capture_button">Capture / Upload</button>
-            <img id="nail-preview" class="image-preview" alt="Nail bed preview" hidden>
+            <img id="nail-preview" class="image-preview" alt="Nail bed preview" loading="lazy" decoding="async" hidden>
             <button id="nail-clear" class="text-link" type="button" hidden>Clear image</button>
           </article>
         </div>

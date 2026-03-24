@@ -16,6 +16,7 @@ import gradio as gr
 import uvicorn
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from PIL import Image
 
 from inference.gradcam import generate_gradcam
@@ -40,6 +41,50 @@ app.add_middleware(
 
 W_CONJ = float(os.getenv("ENSEMBLE_W_CONJ", "0.5"))
 W_NAIL = float(os.getenv("ENSEMBLE_W_NAIL", "0.5"))
+
+SPACE_CSS = """
+:root {
+  --glass-bg: rgba(248, 243, 236, 0.7);
+  --glass-line: rgba(36, 26, 20, 0.1);
+}
+body, .gradio-container {
+  background:
+    radial-gradient(circle at top left, rgba(156, 47, 31, 0.18), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(212, 169, 79, 0.16), transparent 22%),
+    linear-gradient(180deg, #f6efe3 0%, #ecdfcf 100%);
+  font-family: "Aptos", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+}
+.gradio-container {
+  max-width: 1100px !important;
+}
+.gr-box, .block, .gr-panel, .gr-form {
+  border-radius: 24px !important;
+}
+.gradio-container .gr-panel,
+.gradio-container .gr-box,
+.gradio-container .block {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(18px) saturate(135%);
+  border: 1px solid var(--glass-line) !important;
+  box-shadow: 0 22px 60px rgba(70, 44, 30, 0.12);
+}
+.gradio-container h1, .gradio-container h2, .gradio-container h3 {
+  letter-spacing: -0.02em;
+}
+footer { display: none !important; }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-bg: rgba(20, 29, 41, 0.72);
+    --glass-line: rgba(237, 241, 247, 0.08);
+  }
+  body, .gradio-container {
+    background:
+      radial-gradient(circle at top left, rgba(255, 122, 89, 0.14), transparent 24%),
+      radial-gradient(circle at bottom right, rgba(127, 81, 255, 0.12), transparent 20%),
+      linear-gradient(180deg, #0e141c 0%, #101922 100%);
+  }
+}
+"""
 
 _MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
 _MAX_IMAGE_PIXELS = 4096 * 4096  # ~16 MP
@@ -67,6 +112,11 @@ def health():
     from inference.model_loader import _MODEL_CACHE
 
     return {"status": "ok", "models_loaded": list(_MODEL_CACHE.keys())}
+
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/demo")
 
 
 @app.post("/api/predict")
@@ -173,6 +223,12 @@ demo = gr.Interface(
         "and classify anemia severity. **Research tool only -- not a medical device.**"
     ),
     examples=[],
+    theme=gr.themes.Soft(
+        primary_hue="rose",
+        secondary_hue="amber",
+        neutral_hue="stone",
+    ),
+    css=SPACE_CSS,
 )
 
 app = gr.mount_gradio_app(app, demo, path="/demo")
