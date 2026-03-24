@@ -149,4 +149,5 @@ export function initScreeningMode() {
   });
 
   updateAnalyzeState();
+  setLoading(false);
 }
