@@ -1,0 +1,51 @@
+# .github/workflows/benchmark-report.yml
+name: Generate Benchmark Report
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [model-updated]   # triggered by train.yml after training
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install huggingface_hub matplotlib numpy scipy
+
+      - name: Generate benchmark report
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          huggingface-cli login --token "$HF_TOKEN"
+          python scripts/generate_benchmark_report.py
+
+      - name: Commit benchmark artifacts via PR branch
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Push to a separate branch (avoids the no-commit-to-branch pre-commit hook)
+          BRANCH="benchmarks/auto-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git add docs/benchmarks/
+          if git diff --cached --quiet; then
+            echo "No benchmark changes to commit."
+          else
+            git commit -m "ci: update benchmark figures and tables [skip ci]"
+            git push origin "$BRANCH"
+            # Auto-merge via GH CLI (no review required for benchmark data)
+            gh pr create --title "Auto: update benchmark artifacts" \
+              --body "Automatically generated after model training." \
+              --base main --head "$BRANCH" --label "automated"
+            gh pr merge --auto --squash
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
