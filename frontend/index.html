@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b91c1c" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <title>AnemiaScan</title>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <h1 class="app-title" data-i18n="title">🩸 AnemiaScan</h1>
+      <div class="header-actions">
+        <button id="lang-toggle" class="btn btn-ghost btn-sm">ಕನ್ನಡ</button>
+        <button id="mode-toggle" class="btn btn-ghost" data-i18n="advancedMode">Advanced Mode</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Screening Mode (default) -->
+    <section id="screening-panel" class="panel active">
+      <p class="disclaimer" data-i18n="disclaimer">⚠️ Research tool only. Not a certified diagnostic device. Clinical confirmation required.</p>
+
+      <div class="capture-grid">
+        <div class="capture-card" id="conj-card">
+          <label class="capture-label" for="conj-input" data-i18n="conjLabel">Conjunctiva</label>
+          <button class="btn btn-capture" id="conj-btn" data-i18n="captureBtn">📷 Capture</button>
+          <input type="file" id="conj-input" accept="image/*" capture="environment" hidden />
+          <img id="conj-preview" class="preview-img hidden" alt="Conjunctiva preview" />
+        </div>
+
+        <div class="capture-card" id="nail-card">
+          <label class="capture-label" for="nail-input" data-i18n="nailLabel">Nail-bed</label>
+          <button class="btn btn-capture" id="nail-btn" data-i18n="captureBtn">📷 Capture</button>
+          <input type="file" id="nail-input" accept="image/*" capture="environment" hidden />
+          <img id="nail-preview" class="preview-img hidden" alt="Nail-bed preview" />
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="analyse-btn" disabled data-i18n="analyseBtn">Analyse</button>
+
+      <div id="result-card" class="result-card hidden">
+        <div class="result-row">
+          <span class="result-label" data-i18n="hbLabel">Hb:</span>
+          <span id="hb-value" class="hb-value">-- g/dL</span>
+          <span id="ci-value" class="ci-value"></span>
+        </div>
+        <div class="result-badge-row">
+          <span id="result-badge" class="result-badge"></span>
+        </div>
+        <p id="referral-msg" class="referral-msg"></p>
+        <p id="confidence-msg" class="confidence-msg"></p>
+        <p class="result-disclaimer" data-i18n="disclaimer">⚠️ Research tool only. Not a certified diagnostic device. Clinical confirmation required.</p>
+      </div>
+
+      <div id="spinner" class="spinner hidden"></div>
+    </section>
+
+    <!-- Advanced Mode -->
+    <section id="advanced-panel" class="panel hidden">
+      <p class="disclaimer" data-i18n="disclaimer">⚠️ Research tool only. Not a certified diagnostic device. Clinical confirmation required.</p>
+
+      <div class="capture-grid">
+        <div class="capture-card">
+          <label class="capture-label" for="adv-conj-input" data-i18n="conjLabel">Conjunctiva</label>
+          <button class="btn btn-capture" id="adv-conj-btn" data-i18n="captureBtn">📷 Capture</button>
+          <input type="file" id="adv-conj-input" accept="image/*" capture="environment" hidden />
+          <img id="adv-conj-preview" class="preview-img hidden" alt="Conjunctiva preview" />
+        </div>
+
+        <div class="capture-card">
+          <label class="capture-label" for="adv-nail-input" data-i18n="nailLabel">Nail-bed</label>
+          <button class="btn btn-capture" id="adv-nail-btn" data-i18n="captureBtn">📷 Capture</button>
+          <input type="file" id="adv-nail-input" accept="image/*" capture="environment" hidden />
+          <img id="adv-nail-preview" class="preview-img hidden" alt="Nail-bed preview" />
+        </div>
+      </div>
+
+      <div class="model-row">
+        <label for="model-select" data-i18n="modelLabel">Model:</label>
+        <select id="model-select">
+          <option value="ensemble">Ensemble</option>
+          <option value="conjunctiva">Conjunctiva only</option>
+          <option value="nailbed">Nail-bed only</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="adv-analyse-btn" disabled data-i18n="analyseBtn">Analyse</button>
+
+      <div id="adv-spinner" class="spinner hidden"></div>
+
+      <div id="adv-result" class="adv-result hidden">
+        <table class="result-table" id="result-table">
+          <thead>
+            <tr>
+              <th data-i18n="metricHeader">Metric</th>
+              <th data-i18n="valueHeader">Value</th>
+            </tr>
+          </thead>
+          <tbody id="result-tbody"></tbody>
+        </table>
+
+        <h3 data-i18n="perModelHeader">Per-Model Results</h3>
+        <div id="per-model-div"></div>
+
+        <button class="btn btn-secondary" id="export-btn" data-i18n="exportBtn">Export JSON</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    window._ENV = {
+      HF_SPACE_URL: "{{ HF_SPACE_URL }}",
+      BACKUP_API_URL: "{{ BACKUP_API_URL }}"
+    };
+  </script>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
