@@ -1,12 +1,18 @@
 services:
   - type: web
-    name: anemiascan-inference-backup
+    name: anemia-detection-ai
     runtime: docker
     dockerfilePath: inference/Dockerfile
     envVars:
-      - key: HF_MODEL_REPO
-        value: hssling/anemia-ensemble
+      - key: HF_CONJ_MODEL_REPO
+        value: hssling/anemia-efficientnet-b4-conjunctiva
+      - key: HF_NAIL_MODEL_REPO
+        sync: false
       - key: HF_TOKEN
         sync: false
+      - key: ENSEMBLE_W_CONJ
+        value: "1.0"
+      - key: ENSEMBLE_W_NAIL
+        value: "0.0"
     healthCheckPath: /health
     plan: free

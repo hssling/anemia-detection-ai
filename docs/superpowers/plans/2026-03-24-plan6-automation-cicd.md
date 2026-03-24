@@ -657,7 +657,7 @@ jobs:
           sleep 60
           for i in $(seq 1 10); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              "https://anemiascan-inference-backup.onrender.com/health")
+              "https://anemia-detection-ai.onrender.com/health")
             echo "Attempt $i: HTTP $STATUS"
             if [ "$STATUS" = "200" ]; then
               echo "✓ Render service is live"
@@ -687,7 +687,7 @@ gh run watch
 Then verify:
 
 ```bash
-curl https://anemiascan-inference-backup.onrender.com/health
+curl https://anemia-detection-ai.onrender.com/health
 ```
 
 Expected: `{"status":"ok"}`
@@ -732,7 +732,7 @@ python -c "from huggingface_hub import HfApi; a = HfApi(); print(a.model_info('h
 curl https://hssling-anemia-screening.hf.space/health
 
 # Backup: Render is live
-curl https://anemiascan-inference-backup.onrender.com/health
+curl https://anemia-detection-ai.onrender.com/health
 
 # Frontend: Netlify is live
 curl -I https://anemiascan.netlify.app
