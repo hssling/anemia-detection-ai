@@ -1,6 +1,6 @@
 # AnemiaScan AI Pipeline — Design Specification
 
-**Project:** ICMR Extramural Grant — Non-invasive AI-powered anemia screening
+**Project:** ICMR Extramural Grant Proposal Submitted — Non-invasive AI-powered anemia screening
 **PI:** Dr Siddalingaiah H S, SIMSR, Tumakuru
 **Date:** 2026-03-24
 **Status:** Approved for implementation planning
@@ -10,7 +10,7 @@
 
 ## 1. Project Context & Objectives
 
-AnemiaScan is an ICMR-funded research project to build and validate a CNN-based model for non-invasive hemoglobin (Hb) estimation from smartphone-captured images of the **palpebral conjunctiva** and **nail bed**. The primary population is women aged 15–49 and children aged 5–14 in Tumakuru district, Karnataka.
+AnemiaScan is a submitted ICMR extramural grant proposal to build and validate a CNN-based model for non-invasive hemoglobin (Hb) estimation from smartphone-captured images of the **palpebral conjunctiva** and **nail bed**. The proposed primary population is women aged 15–49 and children aged 5–14 in Tumakuru district, Karnataka.
 
 **Primary performance targets (from ICMR proposal):**
 - Regression: MAE ≤ 1.0 g/dL, Pearson r ≥ 0.85
@@ -78,7 +78,7 @@ All datasets downloaded programmatically via Kaggle API, HF Datasets, or direct 
 | Tamir et al. 2021 (IEEE Access) | Conjunctiva | Binary + Hb | ~300 | Iranian population |
 | JSRT / other open medical imaging | Various | Various | Supplement | Only if directly applicable |
 
-**ICMR field data (primary, collected in-study):**
+**Planned Tumakuru field data (to be collected if funding and approvals proceed):**
 - 2,000 conjunctiva + nail-bed image pairs from Tumakuru district
 - Paired with venous Hb (automated hematology analyser) as ground truth
 - Added to HF Dataset after ethics clearance and de-identification
@@ -460,7 +460,7 @@ Error responses:
 | Dimension | Current (Phase 1) | Future |
 |-----------|-------------------|--------|
 | GPU | Kaggle free P100 | Kaggle Pro / GCP A100 (same pipeline, swap config) |
-| Training data | Public datasets + 2K ICMR field data | Multi-centre validation (5 states) |
+| Training data | Public datasets + planned 2K Tumakuru field images if funded | Multi-centre validation (5 states) |
 | Model targets | EfficientNet-B4, V2-S, ConvNeXt-Tiny | Foundation model fine-tuning (BiomedCLIP, RETFound) |
 | Inference | HF Spaces (free) | HF Inference Endpoints (paid) / AWS Lambda |
 | Frontend | Netlify free | Custom domain, PWA for offline field use |
@@ -487,7 +487,7 @@ Error responses:
 - **No PII stored** in any pipeline stage — images identified by study ID only
 - **Model cards** document known limitations, demographic gaps, failure modes
 - **Anemia classification thresholds** follow WHO 2011 guidelines (age/sex adjusted)
-- **ICMR field data**: all sharing governed by IEC approval and participant consent
+- **Planned Tumakuru field data**: any future sharing will be governed by IEC approval and participant consent
 
 ---
 

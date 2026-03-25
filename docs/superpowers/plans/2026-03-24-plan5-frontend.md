@@ -183,7 +183,7 @@ frontend/
 
   <!-- Footer -->
   <footer class="app-footer">
-    <p>AnemiaScan · ICMR Extramural Project · SIMSR Tumakuru</p>
+    <p>AnemiaScan · ICMR proposal submitted · SIMSR Tumakuru</p>
     <p>
       <a href="https://github.com/hssling/anemia-detection-ai" target="_blank" rel="noopener">GitHub</a>
       ·

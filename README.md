@@ -5,7 +5,7 @@
 
 Non-invasive hemoglobin estimation and anemia classification from smartphone-captured images of the palpebral conjunctiva and nail bed.
 
-**ICMR Extramural Grant Project** | SIMSR, Tumakuru, Karnataka
+**ICMR Extramural Grant Proposal Submitted** | SIMSR, Tumakuru, Karnataka
 
 ## Overview
 
@@ -16,7 +16,7 @@ AnemiaScan uses fine-tuned EfficientNet-B4 (+ ensemble) to estimate hemoglobin c
 - Primary model: EfficientNet-B4 dual-head network for Hb regression and four-class anemia severity classification
 - Fine-tuning design: ImageNet-pretrained backbone, task heads warmed first, then selective backbone unfreezing
 - Inference features: MC-dropout uncertainty intervals and Grad-CAM explanations
-- Dataset strategy: public conjunctiva and nail-bed datasets unified with planned ICMR field data from Tumakuru
+- Dataset strategy: public conjunctiva and nail-bed datasets unified with planned Tumakuru field data if the submitted ICMR proposal is approved
 - Tracked metrics: MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, Bland-Altman analysis
 - Project design targets: MAE <= 1.0 g/dL, Pearson r >= 0.85, AUC >= 0.85, sensitivity/specificity >= 80%
 

@@ -68,7 +68,7 @@ Expected: `✓ Logged in to github.com as <username>`
 ```bash
 gh repo create anemia-detection-ai \
   --public \
-  --description "AnemiaScan: AI-powered non-invasive anemia screening from conjunctival and nail-bed images (ICMR funded)" \
+  --description "AnemiaScan: AI-powered non-invasive anemia screening from conjunctival and nail-bed images (ICMR proposal submitted)" \
   --clone
 cd anemia-detection-ai
 ```
@@ -544,7 +544,7 @@ Expected: all four repos visible.
 
 Non-invasive hemoglobin estimation and anemia classification from smartphone-captured images of the palpebral conjunctiva and nail bed.
 
-**ICMR Extramural Grant Project** | SIMSR, Tumakuru, Karnataka
+**ICMR Extramural Grant Proposal Submitted** | SIMSR, Tumakuru, Karnataka
 
 ## Overview
 
