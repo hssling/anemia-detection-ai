@@ -20,6 +20,18 @@ AnemiaScan uses fine-tuned EfficientNet-B4 (+ ensemble) to estimate hemoglobin c
 - Tracked metrics: MAE, RMSE, Pearson r, AUC, F1, sensitivity, specificity, Bland-Altman analysis
 - Project design targets: MAE <= 1.0 g/dL, Pearson r >= 0.85, AUC >= 0.85, sensitivity/specificity >= 80%
 
+## Current Notebook Metrics
+
+Saved Kaggle notebook version 18 outputs for the current conjunctiva-only public-data run report:
+
+- 5-fold CV conjunctiva: loss `4.2700 +/- 0.2910`, MAE `1.8354 +/- 0.0956` g/dL, RMSE `2.3545 +/- 0.1039` g/dL
+- 5-fold CV conjunctiva: Pearson r `0.1842 +/- 0.0895`, Pearson p `0.1414 +/- 0.1718`
+- 5-fold CV conjunctiva: AUC `0.6601 +/- 0.0307`, F1 `0.3530 +/- 0.0151`
+- Final conjunctiva training run: best validation MAE `1.568` g/dL
+- Final conjunctiva training run: peak validation AUC `0.833`
+
+These values are still research-only and should not be treated as clinical performance claims. The version 18 run is materially more plausible than the earlier degenerate placeholder outputs, but it is still based on public conjunctiva data only and does not represent prospective field validation in Tumakuru.
+
 ## Repository Structure
 
 - `data/scripts/` - Dataset download, unification, HF upload

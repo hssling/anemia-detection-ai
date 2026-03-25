@@ -492,3 +492,19 @@ Error responses:
 ---
 
 *Design approved by PI. Implementation plan to follow.*
+
+## 15. Current Notebook Output Snapshot
+
+Saved Kaggle notebook version 18 outputs from the current conjunctiva-only public-data training run reported:
+
+- 5-fold CV conjunctiva: loss `4.270048254728318 +/- 0.29095888371646844`
+- 5-fold CV conjunctiva: MAE `1.8353559622564923 +/- 0.09561890706236868` g/dL
+- 5-fold CV conjunctiva: RMSE `2.354457066511904 +/- 0.10391199888846643` g/dL
+- 5-fold CV conjunctiva: Pearson r `0.18420605013900254 +/- 0.08953486799435169`
+- 5-fold CV conjunctiva: Pearson p `0.14135212136807332 +/- 0.17183335444007958`
+- 5-fold CV conjunctiva: AUC `0.6601340040840524 +/- 0.03071796710636841`
+- 5-fold CV conjunctiva: F1 `0.3529934957733224 +/- 0.015139338923001526`
+- Final conjunctiva run: best validation MAE `1.568` g/dL
+- Final conjunctiva run: peak validation AUC `0.833`
+
+Interpretation note: these are the saved outputs from the latest successful public-data conjunctiva run and replace the earlier degenerate placeholder metrics. They remain research-stage training results only and should not be presented as prospective clinical validation.

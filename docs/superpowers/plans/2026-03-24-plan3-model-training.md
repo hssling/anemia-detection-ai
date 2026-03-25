@@ -1403,3 +1403,16 @@ Plan 3 is complete when:
 - [ ] `v0.3.0` tag pushed
 
 **Next:** Plan 4 — Inference API (FastAPI + Gradio HF Space)
+## Current Saved Notebook Outputs
+
+- CV conjunctiva: loss `4.270048254728318 +/- 0.29095888371646844`
+- CV conjunctiva: MAE `1.8353559622564923 +/- 0.09561890706236868` g/dL
+- CV conjunctiva: RMSE `2.354457066511904 +/- 0.10391199888846643` g/dL
+- CV conjunctiva: Pearson r `0.18420605013900254 +/- 0.08953486799435169`
+- CV conjunctiva: Pearson p `0.14135212136807332 +/- 0.17183335444007958`
+- CV conjunctiva: AUC `0.6601340040840524 +/- 0.03071796710636841`
+- CV conjunctiva: F1 `0.3529934957733224 +/- 0.015139338923001526`
+- Final conjunctiva run: best validation MAE `1.568` g/dL
+- Final conjunctiva run: peak validation AUC `0.833`
+
+These are provisional research notebook outputs from the latest successful public-data conjunctiva run. They are useful for engineering progress tracking, but they should still not be treated as final field-validated benchmark results.
